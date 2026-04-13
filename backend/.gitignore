@@ -1,0 +1,106 @@
+# ------------------------------
+# Python cache
+# ------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ------------------------------
+# Virtual environments
+# ------------------------------
+venv/
+env/
+ENV/
+.venv/
+
+# ------------------------------
+# Environment variables
+# ------------------------------
+.env
+.env.*
+!.env.example
+
+# ------------------------------
+# Logs
+# ------------------------------
+*.log
+
+# ------------------------------
+# Database
+# ------------------------------
+*.db
+*.sqlite3
+
+# ------------------------------
+# Alembic migrations
+# ------------------------------
+# (Keep versions if you use migrations!)
+alembic/versions/__pycache__/
+
+# ------------------------------
+# IDE / Editor
+# ------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ------------------------------
+# OS files
+# ------------------------------
+.DS_Store
+Thumbs.db
+
+# ------------------------------
+# Test / coverage
+# ------------------------------
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ------------------------------
+# Build / packaging
+# ------------------------------
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ------------------------------
+# Type checking / linting
+# ------------------------------
+.mypy_cache/
+.pyre/
+.ruff_cache/
+
+# ------------------------------
+# Jupyter notebooks (optional)
+# ------------------------------
+.ipynb_checkpoints/
+
+# ------------------------------
+# Docker (optional overrides)
+# ------------------------------
+docker-compose.override.yml
+
+# ------------------------------
+# Uploaded files / storage
+# ------------------------------
+uploads/
+media/
+storage/
+
+# ------------------------------
+# Static files (if generated)
+# ------------------------------
+staticfiles/
+
+# ------------------------------
+# Secrets / keys
+# ------------------------------
+*.pem
+*.key
+*.crt
+
+*.pid
+*.sock

@@ -1,0 +1,107 @@
+metric_name,statement_name,metric_path,parent_metric_path
+Accounts Payable,Balance Sheet,Total Current Liabilities > Accounts Payable,Total Current Liabilities
+"Accounts Receivables - Trade, Net",Balance Sheet,"Total Current Assets > Accounts Receivables - Trade, Net",Total Current Assets
+Accrued Expenses,Balance Sheet,Total Current Liabilities > Accrued Expenses,Total Current Liabilities
+"Accumulated Depreciation, Total",Balance Sheet,"Total Assets > Accumulated Depreciation, Total",Total Assets
+Additional Paid-In Capital,Balance Sheet,Total Equity > Additional Paid-In Capital,Total Equity
+Amortization,Cash Flow,Cash From Operating Activities > Amortization,Cash From Operating Activities
+Beginning Cash Balance,Cash Flow,Beginning Cash Balance,
+Capital Expenditures,Cash Flow,Cash From Investing Activities > Capital Expenditures,Cash From Investing Activities
+Capital Lease Obligations,Balance Sheet,Total Liabilities > Capital Lease Obligations,Total Liabilities
+Cash,Balance Sheet,Total Current Assets > Cash,Total Current Assets
+Cash & Equivalents,Balance Sheet,Total Current Assets > Cash & Equivalents,Total Current Assets
+Cash From Financing Activities,Cash Flow,Cash From Financing Activities,
+Cash From Investing Activities,Cash Flow,Cash From Investing Activities,
+Cash From Operating Activities,Cash Flow,Cash From Operating Activities,
+Cash Interest Paid,Cash Flow,Cash From Operating Activities > Cash Interest Paid,Cash From Operating Activities
+Cash Payments,Cash Flow,Cash From Operating Activities > Cash Payments,Cash From Operating Activities
+Cash Receipts,Cash Flow,Cash From Operating Activities > Cash Receipts,Cash From Operating Activities
+Cash Taxes Paid,Cash Flow,Cash From Operating Activities > Cash Taxes Paid,Cash From Operating Activities
+Cash and Short Term Investments,Balance Sheet,Total Current Assets > Cash and Short Term Investments,Total Current Assets
+Changes in Working Capital,Cash Flow,Cash From Operating Activities > Changes in Working Capital,Cash From Operating Activities
+"Common Stock, Total",Balance Sheet,"Total Equity > Common Stock, Total",Total Equity
+"Cost of Revenue, Total",Income Statement,"Cost of Revenue, Total",
+Current Port. of LT Debt/Capital Leases,Balance Sheet,Total Current Liabilities > Current Port. of LT Debt/Capital Leases,Total Current Liabilities
+DPS - Common Stock Primary Issue,Income Statement,DPS - Common Stock Primary Issue,
+Deferred Income Tax,Balance Sheet,Total Liabilities > Deferred Income Tax,Total Liabilities
+Deferred Taxes,Cash Flow,Cash From Operating Activities > Deferred Taxes,Cash From Operating Activities
+Depreciation / Amortization,Income Statement,Total Operating Expenses > Depreciation / Amortization,Total Operating Expenses
+Depreciation/Depletion,Cash Flow,Cash From Operating Activities > Depreciation/Depletion,Cash From Operating Activities
+Diluted EPS Excluding Extraordinary Items,Income Statement,Diluted EPS Excluding Extraordinary Items,
+Diluted Net Income,Income Statement,Diluted Net Income,
+Diluted Normalized EPS,Income Statement,Diluted Normalized EPS,
+Diluted Weighted Average Shares,Income Statement,Diluted Weighted Average Shares,
+Dilution Adjustment,Income Statement,Dilution Adjustment,
+ESOP Debt Guarantee,Balance Sheet,Total Equity > ESOP Debt Guarantee,Total Equity
+Ending Cash Balance,Cash Flow,Ending Cash Balance,
+Equity In Affiliates,Income Statement,Equity In Affiliates,
+Financing Cash Flow Items,Cash Flow,Cash From Financing Activities > Financing Cash Flow Items,Cash From Financing Activities
+Foreign Exchange Effects,Cash Flow,Foreign Exchange Effects,
+Free Cash Flow,Cash Flow,Free Cash Flow,
+Free Cash Flow Growth,Cash Flow,Free Cash Flow Growth,
+Free Cash Flow Yield,Cash Flow,Free Cash Flow Yield,
+Gain (Loss) on Sale of Assets,Income Statement,Gain (Loss) on Sale of Assets,
+"Goodwill, Net",Balance Sheet,"Total Assets > Goodwill, Net",Total Assets
+Gross Profit,Income Statement,Gross Profit,
+Income Available to Common Excluding Extraordinary Items,Income Statement,Income Available to Common Excluding Extraordinary Items,
+"Intangibles, Net",Balance Sheet,"Total Assets > Intangibles, Net",Total Assets
+Interest Expense (Income) - Net Operating,Income Statement,Total Operating Expenses > Interest Expense (Income) - Net Operating,Total Operating Expenses
+"Interest Income (Expense), Net Non-Operating",Income Statement,"Interest Income (Expense), Net Non-Operating",
+"Issuance (Retirement) of Debt, Net",Cash Flow,"Cash From Financing Activities > Issuance (Retirement) of Debt, Net",Cash From Financing Activities
+"Issuance (Retirement) of Stock, Net",Cash Flow,"Cash From Financing Activities > Issuance (Retirement) of Stock, Net",Cash From Financing Activities
+Long Term Debt,Balance Sheet,Total Liabilities > Long Term Debt,Total Liabilities
+Long Term Investments,Balance Sheet,Total Assets > Long Term Investments,Total Assets
+Minority Interest,Balance Sheet,Total Liabilities > Minority Interest,Total Liabilities
+Minority Interest,Income Statement,Minority Interest,
+Net Change in Cash,Cash Flow,Net Change in Cash,
+Net Income,Income Statement,Net Income,
+Net Income After Taxes,Income Statement,Net Income After Taxes,
+Net Income Before Extraordinary Items,Income Statement,Net Income Before Extraordinary Items,
+Net Income Before Taxes,Income Statement,Net Income Before Taxes,
+Net Income/Starting Line,Cash Flow,Net Income/Starting Line,
+Non-Cash Items,Cash Flow,Cash From Operating Activities > Non-Cash Items,Cash From Operating Activities
+Note Receivable - Long Term,Balance Sheet,Total Assets > Note Receivable - Long Term,Total Assets
+Notes Payable/Short Term Debt,Balance Sheet,Total Current Liabilities > Notes Payable/Short Term Debt,Total Current Liabilities
+Operating Income,Income Statement,Operating Income,
+"Other Assets, Total",Balance Sheet,"Total Assets > Other Assets, Total",Total Assets
+"Other Current Assets, Total",Balance Sheet,"Total Current Assets > Other Current Assets, Total",Total Current Assets
+"Other Current liabilities, Total",Balance Sheet,"Total Current Liabilities > Other Current liabilities, Total",Total Current Liabilities
+"Other Equity, Total",Balance Sheet,"Total Equity > Other Equity, Total",Total Equity
+"Other Investing Cash Flow Items, Total",Cash Flow,"Cash From Investing Activities > Other Investing Cash Flow Items, Total",Cash From Investing Activities
+"Other Liabilities, Total",Balance Sheet,"Total Liabilities > Other Liabilities, Total",Total Liabilities
+"Other Long Term Assets, Total",Balance Sheet,"Total Assets > Other Long Term Assets, Total",Total Assets
+"Other Operating Expenses, Total",Income Statement,"Total Operating Expenses > Other Operating Expenses, Total",Total Operating Expenses
+"Other Revenue, Total",Income Statement,"Total Revenue > Other Revenue, Total",Total Revenue
+"Other, Net",Income Statement,"Other, Net",
+Payable/Accrued,Balance Sheet,Total Current Liabilities > Payable/Accrued,Total Current Liabilities
+"Preferred Stock - Non Redeemable, Net",Balance Sheet,"Total Equity > Preferred Stock - Non Redeemable, Net",Total Equity
+Prepaid Expenses,Balance Sheet,Total Current Assets > Prepaid Expenses,Total Current Assets
+"Property/Plant/Equipment, Total - Gross",Balance Sheet,"Total Assets > Property/Plant/Equipment, Total - Gross",Total Assets
+"Property/Plant/Equipment, Total - Net",Balance Sheet,"Total Assets > Property/Plant/Equipment, Total - Net",Total Assets
+Provision for Income Taxes,Income Statement,Provision for Income Taxes,
+"Redeemable Preferred Stock, Total",Balance Sheet,"Total Equity > Redeemable Preferred Stock, Total",Total Equity
+Research & Development,Income Statement,Total Operating Expenses > Research & Development,Total Operating Expenses
+Retained Earnings (Accumulated Deficit),Balance Sheet,Total Equity > Retained Earnings (Accumulated Deficit),Total Equity
+Revenue,Income Statement,Total Revenue > Revenue,Total Revenue
+"Selling/General/Admin. Expenses, Total",Income Statement,"Total Operating Expenses > Selling/General/Admin. Expenses, Total",Total Operating Expenses
+Short Term Investments,Balance Sheet,Total Current Assets > Short Term Investments,Total Current Assets
+Total Adjustments to Net Income,Income Statement,Total Adjustments to Net Income,
+Total Assets,Balance Sheet,Total Assets,
+Total Cash Dividends Paid,Cash Flow,Cash From Financing Activities > Total Cash Dividends Paid,Cash From Financing Activities
+Total Common Shares Outstanding,Balance Sheet,Total Common Shares Outstanding,
+Total Current Assets,Balance Sheet,Total Current Assets,
+Total Current Liabilities,Balance Sheet,Total Current Liabilities,
+Total Equity,Balance Sheet,Total Equity,
+Total Extraordinary Items,Income Statement,Total Extraordinary Items,
+Total Inventory,Balance Sheet,Total Current Assets > Total Inventory,Total Current Assets
+Total Liabilities,Balance Sheet,Total Liabilities,
+Total Liabilities & Shareholders' Equity,Balance Sheet,Total Liabilities & Shareholders' Equity,
+Total Long Term Debt,Balance Sheet,Total Liabilities > Total Long Term Debt,Total Liabilities
+Total Operating Expenses,Income Statement,Total Operating Expenses,
+Total Preferred Shares Outstanding,Balance Sheet,Total Preferred Shares Outstanding,
+"Total Receivables, Net",Balance Sheet,"Total Current Assets > Total Receivables, Net",Total Current Assets
+Total Revenue,Income Statement,Total Revenue,
+Treasury Stock - Common,Balance Sheet,Total Equity > Treasury Stock - Common,Total Equity
+U.S GAAP Adjustment,Income Statement,U.S GAAP Adjustment,
+Unrealized Gain (Loss),Balance Sheet,Total Equity > Unrealized Gain (Loss),Total Equity
+Unusual Expense (Income),Income Statement,Total Operating Expenses > Unusual Expense (Income),Total Operating Expenses

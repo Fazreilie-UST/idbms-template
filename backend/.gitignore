@@ -86,9 +86,7 @@ docker-compose.override.yml
 # ------------------------------
 # Uploaded files / storage
 # ------------------------------
-uploads/
-media/
-storage/
+storage/imports
 
 # ------------------------------
 # Static files (if generated)

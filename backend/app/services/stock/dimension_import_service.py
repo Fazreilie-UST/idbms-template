@@ -23,7 +23,7 @@ from app.services.storage.file_storage_service import FileStorageService
 class DimensionImportService:
     CHUNK_SIZE = 1000
     MAX_ERROR_MESSAGES = 100
-    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
 
     MODEL_MAP = {
         "dim_stock": {

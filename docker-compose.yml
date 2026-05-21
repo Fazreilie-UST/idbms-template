@@ -26,6 +26,12 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgresql://fastraylee:R0r0n0@db:5432/idbms
+      - RATE_LIMIT_STORAGE_URI=redis://redis:6379/0
+      # Persist user-uploaded profile pictures on the host so they survive
+      # container restarts / rebuilds. Path matches the bind mount below.
+      - PROFILE_PICTURE_DIR=/app/profile-pictures
+    volumes:
+      - ./db/profile-pictures:/app/profile-pictures
 
   frontend:
     build: ./frontend
@@ -51,6 +57,17 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
+  redis:
+    image: redis:7-alpine
+    container_name: idbms_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
 volumes:
   postgres_data:
   pgadmin_data:
+  redis_data:

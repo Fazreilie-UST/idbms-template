@@ -1,0 +1,7 @@
+.build-plan-table .clickable-build-plan-row {
+  cursor: pointer;
+}
+
+.build-plan-table .clickable-build-plan-row:hover > td {
+  background: #fafafa !important;
+}

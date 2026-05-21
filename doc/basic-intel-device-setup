@@ -1,0 +1,38 @@
+# Windows
+(proxy server)
+
+
+(github)
+
+- WSL
+(proxy server)
+OPTION 1
+export HTTPS_PROXY=http://proxy-dmz.intel.com:912
+export https_proxy=http://proxy-dmz.intel.com:912
+OR
+nano ~/.bashrc
+export HTTP_PROXY=http://proxy-dmz.intel.com:912
+export http_proxy=http://proxy-dmz.intel.com:912
+export HTTPS_PROXY=http://proxy-dmz.intel.com:912
+export https_proxy=http://proxy-dmz.intel.com:912
+ctrl + o, ctrl + x
+source ~/.bashrc
+env | grep -i proxy
+
+open powershell as admin
+wsl --shutdown
+netsh winsock reset
+netsh int ip reset
+
+
+OPTION 2
+create .wslconfig file inside C:\Users\fbinalex
+add config below
+    [wsl2]
+    networkingMode=mirrored
+    dnsTunneling=true
+    autoProxy=true
+    
+
+# Linux
+(proxy server)

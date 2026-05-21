@@ -110,3 +110,15 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* AntD's <Typography.Text code> renders an inner <code> on its own light
+   grey pill background. Force a dark, readable color here so the global
+   `code { color: var(--text-h) }` rule above doesn't bleed it into
+   theme-tinted (and on dark mode, near-invisible) text. */
+.ant-typography code,
+code.ant-typography {
+  color: rgba(0, 0, 0, 0.88);
+  display: inline;
+  font-size: inherit;
+  padding: 1px 5px;
+}

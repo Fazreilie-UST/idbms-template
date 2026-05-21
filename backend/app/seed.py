@@ -13,7 +13,13 @@ from app.models.stock.dim_metric import DimMetric
 from app.models.stock.fact_financial_values import FactFinancialValues
 
 
-CSV_DATA_PATH = Path(r"C:\PROJECT\UST\IDBMS\db\stock\transformed_data\b1")
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+CSV_DATA_PATH = Path("/home/fbinalex/NPI-IDBMS/db/stock/transformed_data/b1")
+
 
 
 def clean_text(value):
@@ -67,7 +73,7 @@ def bulk_insert_do_nothing(db: Session, model, records, conflict_cols=None):
 
 def seed_dim_stock(db: Session):
     try:
-        print("📥 Seeding dim_stock...")
+        logger.info("📥 Seeding dim_stock...")
 
         df = pd.read_csv(
             CSV_DATA_PATH / "dim_stock.csv",
@@ -99,16 +105,16 @@ def seed_dim_stock(db: Session):
             conflict_cols=["stock_number"],
         )
 
-        print(f"✅ dim_stock: {inserted} rows inserted")
+        logger.info(f"✅ dim_stock: {inserted} rows inserted")
 
     except Exception as e:
         db.rollback()
-        print(f"❌ dim_stock error: {e}")
+        logger.info(f"❌ dim_stock error: {e}")
 
 
 def seed_dim_date(db: Session):
     try:
-        print("📥 Seeding dim_date...")
+        logger.info("📥 Seeding dim_date...")
 
         df = pd.read_csv(CSV_DATA_PATH / "dim_date.csv", keep_default_na=False)
         df["full_date"] = pd.to_datetime(df["full_date"]).dt.date
@@ -124,16 +130,16 @@ def seed_dim_date(db: Session):
             conflict_cols=["full_date"],
         )
 
-        print(f"✅ dim_date: {inserted} rows inserted")
+        logger.info(f"✅ dim_date: {inserted} rows inserted")
 
     except Exception as e:
         db.rollback()
-        print(f"❌ dim_date error: {e}")
+        logger.info(f"❌ dim_date error: {e}")
 
 
 def seed_dim_statement(db: Session):
     try:
-        print("📥 Seeding dim_statement...")
+        logger.info("📥 Seeding dim_statement...")
 
         df = pd.read_csv(CSV_DATA_PATH / "dim_statement.csv", keep_default_na=False)
         df["statement_name"] = df["statement_name"].apply(clean_text)
@@ -150,16 +156,16 @@ def seed_dim_statement(db: Session):
             conflict_cols=["statement_name"],
         )
 
-        print(f"✅ dim_statement: {inserted} rows inserted")
+        logger.info(f"✅ dim_statement: {inserted} rows inserted")
 
     except Exception as e:
         db.rollback()
-        print(f"❌ dim_statement error: {e}")
+        logger.info(f"❌ dim_statement error: {e}")
 
 
 def seed_dim_metric(db: Session):
     try:
-        print("📥 Seeding dim_metric...")
+        logger.info("📥 Seeding dim_metric...")
 
         df = pd.read_csv(
             CSV_DATA_PATH / "dim_metric.csv",
@@ -220,9 +226,9 @@ def seed_dim_metric(db: Session):
 
         pending_rows = df.to_dict(orient="records")
 
-        print("🔎 Sample parent_metric_path values after normalization:")
+        logger.info("🔎 Sample parent_metric_path values after normalization:")
         for row in pending_rows[:10]:
-            print(
+            logger.info(
                 f"   metric={repr(row['metric_path'])} "
                 f"parent={repr(row['parent_metric_path'])} "
                 f"type={type(row['parent_metric_path']).__name__}"
@@ -249,7 +255,7 @@ def seed_dim_metric(db: Session):
 
                 statement_id = statement_map.get(statement_name)
                 if statement_id is None:
-                    print(f"⚠️ statement_name not found, skipping metric: {statement_name}")
+                    logger.info(f"⚠️ statement_name not found, skipping metric: {statement_name}")
                     continue
 
                 parent_metric_id = None
@@ -263,7 +269,7 @@ def seed_dim_metric(db: Session):
                         continue
 
                     if parent_metric.statement_id != statement_id:
-                        print(
+                        logger.info(
                             f"⚠️ parent/child statement mismatch, skipping metric: "
                             f"parent={repr(parent_metric_path)} child={repr(metric_path)}"
                         )
@@ -286,32 +292,32 @@ def seed_dim_metric(db: Session):
                 inserted_count += 1
 
             db.commit()
-            print(f"✅ dim_metric round {round_num}: {inserted_this_round} rows inserted")
+            logger.info(f"✅ dim_metric round {round_num}: {inserted_this_round} rows inserted")
 
             if inserted_this_round == 0:
                 if next_pending:
-                    print("⚠️ Could not resolve some metric parent relationships:")
+                    logger.info("⚠️ Could not resolve some metric parent relationships:")
                     for row in next_pending[:20]:
-                        print(
+                        logger.info(
                             f"   child={repr(row['metric_path'])} "
                             f"parent={repr(row['parent_metric_path'])}"
                         )
-                    print(f"⚠️ unresolved metric rows skipped: {len(next_pending)}")
+                    logger.info(f"⚠️ unresolved metric rows skipped: {len(next_pending)}")
                 break
 
             pending_rows = next_pending
 
-        print(f"✅ dim_metric total inserted: {inserted_count}")
-        print(f"ℹ️ dim_metric already existing rows skipped: {skipped_existing}")
+        logger.info(f"✅ dim_metric total inserted: {inserted_count}")
+        logger.info(f"ℹ️ dim_metric already existing rows skipped: {skipped_existing}")
 
     except Exception as e:
         db.rollback()
-        print(f"❌ dim_metric error: {e}")
+        logger.info(f"❌ dim_metric error: {e}")
 
 
 def seed_fact_financial_values(db: Session):
     try:
-        print("📥 Seeding fact_financial_values...")
+        logger.info("📥 Seeding fact_financial_values...")
 
         df = pd.read_csv(
             CSV_DATA_PATH / "fact_financial_values.csv",
@@ -361,7 +367,7 @@ def seed_fact_financial_values(db: Session):
             )
         )
         if missing_stock:
-            print("⚠️ Missing stock_number in dim_stock (first 20):", missing_stock[:20])
+            logger.info("⚠️ Missing stock_number in dim_stock (first 20):", missing_stock[:20])
 
         records = []
         skipped_rows = 0
@@ -402,16 +408,16 @@ def seed_fact_financial_values(db: Session):
             conflict_cols=["stock_id", "metric_id", "statement_id", "date_id"],
         )
 
-        print(f"✅ fact_financial_values: {inserted} rows inserted")
-        print(f"ℹ️ fact_financial_values skipped rows: {skipped_rows}")
+        logger.info(f"✅ fact_financial_values: {inserted} rows inserted")
+        logger.info(f"ℹ️ fact_financial_values skipped rows: {skipped_rows}")
 
     except Exception as e:
         db.rollback()
-        print(f"❌ fact_financial_values error: {e}")
+        logger.info(f"❌ fact_financial_values error: {e}")
 
 
 def seed_db(db: Session):
-    print("\n📊 Starting database seeding...\n")
+    logger.info("\n📊 Starting database seeding...\n")
 
     try:
         user_records = [
@@ -420,11 +426,11 @@ def seed_db(db: Session):
         ]
         bulk_insert_do_nothing(db, User, user_records, conflict_cols=["email"])
 
-        print("✅ Mock user data seeded")
+        logger.info("✅ Mock user data seeded")
 
     except Exception as e:
         db.rollback()
-        print(f"⚠️ Mock data error: {e}")
+        logger.info(f"⚠️ Mock data error: {e}")
 
     seed_dim_statement(db)
     seed_dim_stock(db)
@@ -432,4 +438,4 @@ def seed_db(db: Session):
     seed_dim_metric(db)
     seed_fact_financial_values(db)
 
-    print("\n✅ Database seeding completed!\n")
+    logger.info("\n✅ Database seeding completed!\n")

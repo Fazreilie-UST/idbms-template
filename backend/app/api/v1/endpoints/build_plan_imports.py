@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import json
 import queue
-import shutil
 import threading
 from datetime import datetime, timezone
 from pathlib import Path

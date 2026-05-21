@@ -1,14 +1,6 @@
 import enum
 
-from ..base import (
-    Base,
-    Column,
-    Integer,
-    Enum,
-    relationship,
-    ForeignKey,
-    UniqueConstraint,
-)
+from ..base import Base, Column, Integer, Enum, relationship, ForeignKey
 
 
 class BuildRequestStatus(str, enum.Enum):

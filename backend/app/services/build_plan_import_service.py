@@ -18,7 +18,7 @@ import re
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Iterator
+from typing import Any, Callable
 
 import pandas as pd
 from openpyxl import load_workbook

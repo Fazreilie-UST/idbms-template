@@ -16,7 +16,6 @@ from app.models.stock.dim_statement import DimStatement
 from app.models.stock.dim_metric import DimMetric
 from app.models.stock.fact_financial_values import FactFinancialValues
 from app.models.stock.import_job import ImportJob
-from app.models.storage.stored_file import StoredFile
 from app.services.storage.file_storage_service import FileStorageService
 
 

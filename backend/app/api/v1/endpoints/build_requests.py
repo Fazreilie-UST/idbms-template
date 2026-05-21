@@ -61,7 +61,6 @@ def get_filter_options(
     statuses) used to populate dropdown filters in the Build Request Tracker.
     """
     from app.models.order.build_request import BuildRequest
-    from app.models.build.family_form_factor import FamilyFormFactor
 
     families = [
         r[0]

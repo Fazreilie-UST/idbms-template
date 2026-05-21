@@ -1,4 +1,4 @@
-from ..base import Base, Column, Integer, Text, Numeric, relationship
+from ..base import Base, Column, Integer, Text, relationship
 
 class DimStatement(Base):
     __tablename__ = "dim_statement"

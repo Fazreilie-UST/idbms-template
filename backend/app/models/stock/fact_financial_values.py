@@ -1,4 +1,4 @@
-from ..base import Base, Column, Integer, Text, Numeric, relationship, ForeignKey, BigInteger
+from ..base import Base, Column, Integer, Numeric, relationship, ForeignKey, BigInteger
 
 class FactFinancialValues(Base):
     __tablename__ = "fact_financial_values"

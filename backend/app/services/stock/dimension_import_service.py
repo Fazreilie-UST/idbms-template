@@ -15,7 +15,7 @@ from app.models.stock.dim_date import DimDate
 from app.models.stock.dim_statement import DimStatement
 from app.models.stock.dim_metric import DimMetric
 from app.models.stock.fact_financial_values import FactFinancialValues
-from app.models.stock.import_job import ImportJob
+from app.services.stock._import_job_helpers import log_import_job, should_log_import
 from app.services.storage.file_storage_service import FileStorageService
 
 
@@ -262,7 +262,7 @@ class DimensionImportService:
             "errors": errors,
         }
 
-        if self._should_log_import(result):
+        if should_log_import(result):
             stored_file = None
             try:
                 stored_file = self.file_storage.save_uploaded_file(
@@ -272,7 +272,8 @@ class DimensionImportService:
                     uploaded_by_id=imported_by_id,
                 )
 
-                job = self._log_import_job(
+                job = log_import_job(
+                    self.db,
                     result,
                     imported_by_id=imported_by_id,
                     file_id=stored_file.file_id,
@@ -290,11 +291,6 @@ class DimensionImportService:
                 raise
 
         return result
-
-    def _should_log_import(self, result: dict[str, Any]) -> bool:
-        if result.get("dry_run", False):
-            return False
-        return (result.get("inserted", 0) > 0) or (result.get("updated", 0) > 0)
 
     def _ensure_replace_all_is_safe(self, table_name: str) -> None:
         fact_fk_column = self.FACT_REFERENCE_MAP.get(table_name)
@@ -317,34 +313,6 @@ class DimensionImportService:
                     "Delete or rebuild dependent fact rows first."
                 ),
             )
-
-    def _log_import_job(
-        self,
-        result: dict[str, Any],
-        imported_by_id: int | None = None,
-        file_id: int | None = None,
-    ) -> ImportJob:
-        job = ImportJob(
-            table_name=result.get("table_name"),
-            filename=result.get("filename"),
-            file_type="csv",
-            replace_all=result.get("replace_all", False),
-            inserted=result.get("inserted", 0),
-            updated=result.get("updated", 0),
-            unchanged=result.get("unchanged", 0),
-            skipped=result.get("skipped", 0),
-            duplicates_in_file=result.get("duplicates_in_file", 0),
-            total_rows=result.get("total_rows", 0),
-            processed_rows=result.get("processed_rows", 0),
-            status=result.get("status", "completed"),
-            message=result.get("message"),
-            imported_by_id=imported_by_id,
-            file_id=file_id,
-        )
-        self.db.add(job)
-        self.db.commit()
-        self.db.refresh(job)
-        return job
 
     def _normalize_stock_number(self, value: str | None) -> str | None:
         if value is None:

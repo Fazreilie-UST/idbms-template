@@ -33,7 +33,6 @@ import {
   getImportShippingInfos,
   getImportSiRows,
   listBuildPlanImports,
-  reprocessBuildPlanImport,
   updateBuildPlanImportMetadata,
   uploadBuildPlanFile,
 } from "@/features/buildplans/services/build_plan_import_service";
@@ -317,7 +316,6 @@ export default function BuildPlanImport() {
         let page = 1;
         // Page size capped at 100 by the backend.
         while (true) {
-          // eslint-disable-next-line no-await-in-loop
           const data = await listBuildPlanImports({
             page,
             pageSize: 100,
@@ -410,7 +408,6 @@ export default function BuildPlanImport() {
         return Array.from(merged);
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [processing, activeIds]);
 
   // Apply in-flight row overrides on top of the server-fetched rows.

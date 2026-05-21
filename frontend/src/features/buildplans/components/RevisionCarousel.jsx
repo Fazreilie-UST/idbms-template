@@ -488,7 +488,6 @@ function renderChangedFields(changedFields, isInitial = false, fallbackSource = 
 export default function RevisionCarousel({
   revisions = [],
   currentStatus,
-  buildPlanId,
   onAddRevisionClick,
   loading = false,
 }) {

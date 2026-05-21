@@ -157,20 +157,6 @@ const orderColumns = [
   },
 ];
 
-const shipmentRecipientColumns = [
-  {
-    title: "Recipient",
-    dataIndex: "name",
-    key: "name",
-    render: (value) => value || "-",
-  },
-  {
-    title: "Quantity",
-    dataIndex: "quantity",
-    key: "quantity",
-  },
-];
-
 const warehouseColumns = [
   {
     title: "Warehouse",

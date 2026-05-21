@@ -74,28 +74,6 @@ function renderBuildNotes(value) {
   );
 }
 
-function renderSiliconSteppings(value) {
-  let items = [];
-  if (Array.isArray(value)) {
-    items = value;
-  } else if (typeof value === "string") {
-    items = value
-      .replace(/^{|}$/g, "")
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  if (!items.length) return "-";
-  return (
-    <Space wrap size={[4, 4]}>
-      <span style={{ fontWeight: 500 }}>Stepping:</span>
-      {items.map((it) => (
-        <Tag key={it}>{it}</Tag>
-      ))}
-    </Space>
-  );
-}
-
 function getServerColumnProps({
   dataIndex,
   title,
@@ -251,20 +229,6 @@ function ExpandedBuildPlanRow({ record }) {
       dataIndex: "quantity",
       key: "quantity",
       sorter: (a, b) => a.quantity - b.quantity,
-    },
-  ];
-
-  const shipmentRecipientColumns = [
-    {
-      title: "Recipient",
-      dataIndex: "name",
-      key: "name",
-      render: (value) => value || "-",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
     },
   ];
 

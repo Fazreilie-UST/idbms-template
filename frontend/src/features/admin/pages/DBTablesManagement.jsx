@@ -58,7 +58,6 @@ import {
   createSiliconStepping,
   updateSiliconStepping,
   deleteSiliconStepping,
-  fetchComponents,
   createComponent,
   updateComponent,
   deleteComponent,
@@ -388,7 +387,6 @@ function ComponentsSuppliersTab() {
 
   useEffect(() => {
     reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredTree = useMemo(() => {
@@ -1372,7 +1370,7 @@ function PMFamiliesTab() {
 
   useEffect(() => {
     load();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleCreate(values) {
     try {

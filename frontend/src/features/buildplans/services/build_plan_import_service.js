@@ -186,7 +186,6 @@ export async function streamProcessBuildPlanImport(id, onEvent) {
   let buffer = "";
   let lastEvent = null;
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;

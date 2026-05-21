@@ -159,7 +159,7 @@ function cleanEmptyChildren(nodes) {
       };
     }
 
-    const { children, ...rest } = node;
+    const { children: _children, ...rest } = node;
     return rest;
   });
 }

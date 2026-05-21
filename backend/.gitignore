@@ -59,10 +59,11 @@ Thumbs.db
 htmlcov/
 
 # ------------------------------
-# Build / packaging
+# Build / packaging (anchored to backend/ root so they don't collide
+# with the app's "build" domain at app/models/build, app/schemas/build, etc.)
 # ------------------------------
-build/
-dist/
+/build/
+/dist/
 *.egg-info/
 .eggs/
 

@@ -32,11 +32,11 @@ node_modules/
 .pnp.js
 
 # ------------------------------
-# Build outputs
+# Build outputs (anchored to frontend/ root)
 # ------------------------------
-dist/
-build/
-.out/
+/dist/
+/build/
+/.out/
 
 # ------------------------------
 # Environment variables

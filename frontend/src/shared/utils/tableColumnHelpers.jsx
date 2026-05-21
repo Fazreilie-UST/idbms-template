@@ -62,23 +62,6 @@ export function textSearchFilter(getValue, placeholder = "Search") {
 }
 
 /**
- * Build a sorter for a numeric-or-null field. Null/undefined sort last
- * regardless of direction.
- */
-export function numericSorter(getValue) {
-  return (a, b) => {
-    const av = getValue(a);
-    const bv = getValue(b);
-    const aMissing = av === null || av === undefined || Number.isNaN(av);
-    const bMissing = bv === null || bv === undefined || Number.isNaN(bv);
-    if (aMissing && bMissing) return 0;
-    if (aMissing) return 1;
-    if (bMissing) return -1;
-    return Number(av) - Number(bv);
-  };
-}
-
-/**
  * Build a locale-aware sorter for a string field. Null/undefined sort last.
  */
 export function stringSorter(getValue) {
@@ -94,25 +77,6 @@ export function stringSorter(getValue) {
       numeric: true,
       sensitivity: "base",
     });
-  };
-}
-
-/**
- * Build a sorter for a date-like field (ISO string, epoch ms, or Date).
- * Null/undefined/invalid sort last.
- */
-export function dateSorter(getValue) {
-  return (a, b) => {
-    const av = getValue(a);
-    const bv = getValue(b);
-    const at = av ? new Date(av).getTime() : NaN;
-    const bt = bv ? new Date(bv).getTime() : NaN;
-    const aMissing = Number.isNaN(at);
-    const bMissing = Number.isNaN(bt);
-    if (aMissing && bMissing) return 0;
-    if (aMissing) return 1;
-    if (bMissing) return -1;
-    return at - bt;
   };
 }
 

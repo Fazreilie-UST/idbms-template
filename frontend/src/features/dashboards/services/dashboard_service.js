@@ -91,10 +91,6 @@ export function fetchMilestoneTimeline(filters, metric = "builds") {
   return get("/milestone-timeline", { ...filtersToParams(filters), metric });
 }
 
-export function fetchFamilyComparison(familyCode, filters) {
-  return get(`/family-comparison/${encodeURIComponent(familyCode)}`, filtersToParams(filters));
-}
-
 export function fetchSupplierComponent(componentName, metric = "builds", slotCode = null, filters = {}) {
   const params = {
     ...filtersToParams(filters),

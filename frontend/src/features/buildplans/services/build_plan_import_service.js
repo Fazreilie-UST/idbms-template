@@ -62,14 +62,6 @@ export async function listBuildPlanImports({
   return handle(res);
 }
 
-export async function getBuildPlanImport(id) {
-  const res = await fetch(`${BASE}/${id}`, {
-    headers: authHeaders(),
-    credentials: "include",
-  });
-  return handle(res);
-}
-
 /**
  * List the rows parsed from the file's "Shipping Info" sheet.
  * Returns: BuildPlanImportShippingInfoResponse[]
@@ -94,15 +86,6 @@ export async function getImportSiRows(id) {
   return handle(res);
 }
 
-export async function reprocessBuildPlanImport(id) {
-  const res = await fetch(`${BASE}/${id}/reprocess`, {
-    method: "POST",
-    headers: authHeaders(),
-    credentials: "include",
-  });
-  return handle(res);
-}
-
 /**
  * Manually update WW / Year / Rev on an uploaded file. Useful when the
  * filename does not match the auto-parser. If the row was `skipped` purely
@@ -116,16 +99,6 @@ export async function updateBuildPlanImportMetadata(id, { work_week, work_year, 
     body: JSON.stringify({ work_week, work_year, file_revision }),
   });
   return handle(res);
-}
-
-export async function processBuildPlanImports(ids) {
-  const res = await fetch(`${BASE}/process`, {
-    method: "POST",
-    headers: authHeaders(),
-    credentials: "include",
-    body: JSON.stringify({ ids }),
-  });
-  return handle(res); // -> { processed, skipped, not_found }
 }
 
 export async function deleteBuildPlanImport(id, { deleteFile = true } = {}) {

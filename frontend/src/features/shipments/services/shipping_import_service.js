@@ -44,48 +44,11 @@ export async function listShippingImports({ page = 1, pageSize = 20, status } = 
   return handle(res);
 }
 
-export async function getShippingImport(id) {
-  const res = await fetch(`${BASE}/${id}`, {
-    headers: authHeaders(),
-    credentials: "include",
-  });
-  return handle(res);
-}
-
-export async function reprocessShippingImport(id) {
-  const res = await fetch(`${BASE}/${id}/reprocess`, {
-    method: "POST",
-    headers: authHeaders(),
-    credentials: "include",
-  });
-  return handle(res);
-}
-
-export async function processShippingImports(ids) {
-  const res = await fetch(`${BASE}/process`, {
-    method: "POST",
-    headers: authHeaders(),
-    credentials: "include",
-    body: JSON.stringify({ ids }),
-  });
-  return handle(res); // -> { processed, skipped, not_found }
-}
-
 export async function deleteShippingImport(id, { deleteFile = true } = {}) {
   const res = await fetch(`${BASE}/${id}?delete_file=${deleteFile}`, {
     method: "DELETE",
     headers: authHeaders(),
     credentials: "include",
-  });
-  return handle(res);
-}
-
-export async function getShippingRowCounts(ids) {
-  const res = await fetch(`${BASE}/row-counts`, {
-    method: "POST",
-    headers: authHeaders(),
-    credentials: "include",
-    body: JSON.stringify({ ids }),
   });
   return handle(res);
 }

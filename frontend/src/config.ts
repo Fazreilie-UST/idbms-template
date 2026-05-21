@@ -6,7 +6,7 @@ const RAW_API_ORIGIN: string =
   (typeof window !== "undefined" && window._env_?.API_URL) ||
   "http://localhost:8000";
 
-export const API_ORIGIN: string = RAW_API_ORIGIN.replace(/\/+$/, "");
+const API_ORIGIN: string = RAW_API_ORIGIN.replace(/\/+$/, "");
 export const API: string = `${API_ORIGIN}/api/v1`;
 
 /**

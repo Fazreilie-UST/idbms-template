@@ -12,11 +12,6 @@ export async function login(email, password) {
   return handleResponse(res);
 }
 
-/** Fetch the currently authenticated user (full profile, including avatar URL). */
-export function getMyProfile() {
-  return apiFetch(`${API}/auth/me`, { method: "GET" });
-}
-
 /**
  * Upload (or replace) the current user's profile picture.
  * Returns the updated user record.

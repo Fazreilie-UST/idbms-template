@@ -161,7 +161,6 @@ export const deleteSiliconStepping = ss.remove;
 
 // Components
 const comp = makeNameCrud("components");
-export const fetchComponents = comp.list;
 export const createComponent = comp.create;
 export const updateComponent = comp.update;
 export const deleteComponent = comp.remove;

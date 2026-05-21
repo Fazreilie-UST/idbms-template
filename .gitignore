@@ -1,0 +1,32 @@
+# ------------------------------
+# Excel / spreadsheet data files
+# ------------------------------
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+
+# ------------------------------
+# Windows alternate-data-stream metadata
+# (appears as "<file>:Zone.Identifier" — git encodes the colon)
+# ------------------------------
+*Zone.Identifier
+
+# ------------------------------
+# Raw / working data folders (not source-controlled)
+# ------------------------------
+backend/data/*
+!backend/data/_seed_shipments_missing_recipients.json
+!backend/data/.gitkeep
+
+db/build-plans/
+db/shippings/
+db/profile-pictures/
+db/stock/original_data/
+db/stock/transformed_data/
+
+# ------------------------------
+# OS / editor cruft
+# ------------------------------
+.DS_Store
+Thumbs.db

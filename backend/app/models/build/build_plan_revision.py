@@ -1,5 +1,6 @@
 from ..base import (
     Base,
+    Boolean,
     Column,
     Integer,
     DateTime,
@@ -10,6 +11,7 @@ from ..base import (
     UniqueConstraint,
     relationship,
     func,
+    text,
 )
 from .build_plan import BuildPlanStatus
 
@@ -67,6 +69,18 @@ class BuildPlanRevision(Base):
     status_at_revision = Column(
         Enum(BuildPlanStatus, name="buildplanstatus"),
         nullable=False,
+    )
+
+    # True when this revision was produced by an Excel build-plan import
+    # file. False for manual revisions authored in the web app. The flag is
+    # tightly correlated with ``import_file_id IS NOT NULL`` but is stored
+    # explicitly so the UI can show an "Imported" tag without joining back
+    # to ``build_plan_import_files``.
+    is_imported = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
     )
 
     created_at = Column(

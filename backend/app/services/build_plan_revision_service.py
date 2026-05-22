@@ -454,6 +454,7 @@ def _create_revision(
         snapshot=snapshot,
         changed_fields=changed_fields,
         status_at_revision=BuildPlanStatus(snapshot["plan"]["status"]),
+        is_imported=import_file is not None,
     )
     session.add(rev)
     session.flush()
@@ -568,6 +569,7 @@ def process_parsed_column(
             status=BuildPlanStatus(snapshot["plan"]["status"]),
             support_activity_id=None,  # set by _apply_scalars
             build_description_id=None,
+            is_imported=True,
         )
         # Need a placeholder for the NOT NULL FK fields before flush; use the
         # resolved ids from _apply_scalars.

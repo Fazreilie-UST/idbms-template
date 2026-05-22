@@ -56,6 +56,10 @@ class BuildPlanListQuery(BaseModel):
     pba_number: Optional[str] = None
     as_number: Optional[str] = None
 
+    # When set, restrict the result set to imported (True) or web-created
+    # (False) build plans. None = no filtering on import origin.
+    is_imported: Optional[bool] = None
+
     sort_by: str = BuildPlanSortBy.id.value
     sort_order: str = SortOrder.desc.value
     my_plans: bool = False
@@ -174,6 +178,10 @@ class BuildPlanResponse(BaseModel):
 
     year: Optional[int] = None
     silicon_steppings: list[str] = Field(default_factory=list)
+
+    # True when this build plan originated from an Excel build-plan import
+    # file. Drives the "Imported" UI tag.
+    is_imported: bool = False
 
     components: list[BuildPlanComponentResponse] = []
     tests: list[BuildPlanTestResponse] = []

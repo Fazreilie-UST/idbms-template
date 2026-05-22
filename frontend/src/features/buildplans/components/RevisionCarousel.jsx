@@ -600,8 +600,9 @@ function RevisionCard({ rev, isInitial = false, prevRev = null }) {
           <Tag color="blue">{rev.status || plan.status || "—"}</Tag>
           {isInitial && (
             <Tag color="green">initial revision</Tag>
-          )}
-        </Space>
+          )}          {rev.is_imported && (
+            <Tag color="geekblue">Imported</Tag>
+          )}        </Space>
       }
       extra={
         <Tooltip

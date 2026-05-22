@@ -2,6 +2,7 @@ import enum
 
 from ..base import (
     Base,
+    Boolean,
     Column,
     Integer,
     String,
@@ -11,6 +12,7 @@ from ..base import (
     DateTime,
     UniqueConstraint,
     Index,
+    text,
 )
 
 
@@ -225,6 +227,18 @@ class BuildPlan(Base):
     # similar widgets can bucket by (year, work_week) without re-parsing the
     # config string.
     work_week = Column(Integer, nullable=True, index=True)
+
+    # True when this build plan originated from an Excel build-plan import
+    # file (legacy / manual file). False for plans authored directly in the
+    # web app. Distinguishes imported lineage from web-managed records and
+    # drives the "Imported" UI tag near the config-number header.
+    is_imported = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
+        index=True,
+    )
 
     support_activity = relationship("SupportActivity")
 

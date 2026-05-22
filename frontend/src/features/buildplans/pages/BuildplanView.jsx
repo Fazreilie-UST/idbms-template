@@ -355,6 +355,15 @@ export default function BuildplanView() {
       <Title level={4} style={{ marginBottom: 24 }}>
         {data?.config_number || `Build Plan #${id}`}
         <Tag style={{ marginLeft: 12, verticalAlign: "middle" }}>{data?.status || "-"}</Tag>
+        {data?.is_imported && (
+          <Tag
+            color="geekblue"
+            style={{ marginLeft: 4, verticalAlign: "middle" }}
+            title="Originated from a build-plan import file"
+          >
+            Imported
+          </Tag>
+        )}
       </Title>
 
       {/* General Info */}

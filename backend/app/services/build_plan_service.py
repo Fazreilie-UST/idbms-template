@@ -410,6 +410,10 @@ def list_build_plans(
             params[param_name] = values
             expanding_params.append(bindparam(param_name, expanding=True))
 
+    if query.is_imported is not None:
+        where_clauses.append("bp.is_imported = :is_imported")
+        params["is_imported"] = bool(query.is_imported)
+
     column_search_map = {
         "config_number": "cn.value",
         "build_description": "bpd.description",
@@ -544,6 +548,7 @@ def list_build_plans(
             bp.required_quantity,
             bp.estimated_yield,
             bp.year,
+            bp.is_imported,
             COALESCE(
                 ARRAY_AGG(DISTINCT ss.name ORDER BY ss.name)
                     FILTER (WHERE ss.name IS NOT NULL),
@@ -714,6 +719,7 @@ def list_build_plans(
             "estimated_yield": row["estimated_yield"],
             "year": row["year"],
             "silicon_steppings": row["silicon_steppings"] or [],
+            "is_imported": bool(row["is_imported"]),
             "components": components_by_plan[bp_id],
             "tests": tests_by_plan[bp_id],
             "build_requests": orders_by_plan[bp_id],
@@ -819,6 +825,7 @@ def get_build_plan_by_id(db: Session, build_plan_id: int) -> dict[str, Any] | No
             bp.required_quantity,
             bp.estimated_yield,
             bp.year,
+            bp.is_imported,
             COALESCE(
                 ARRAY_AGG(DISTINCT ss.name ORDER BY ss.name)
                     FILTER (WHERE ss.name IS NOT NULL),
@@ -944,6 +951,7 @@ def get_build_plan_by_id(db: Session, build_plan_id: int) -> dict[str, Any] | No
         "estimated_yield": row["estimated_yield"],
         "year": row["year"],
         "silicon_steppings": row["silicon_steppings"] or [],
+        "is_imported": bool(row["is_imported"]),
         "components": [
             {
                 "component_name": c["component_name"],
@@ -1011,6 +1019,7 @@ def get_build_plan_revisions(db: Session, build_plan_id: int) -> dict[str, Any] 
                 rev.status_at_revision AS status,
                 rev.changed_fields,
                 rev.snapshot,
+                rev.is_imported,
                 rev.created_at,
                 imp.id AS import_file_id,
                 imp.original_filename AS import_file_name,

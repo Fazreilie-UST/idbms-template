@@ -1437,6 +1437,7 @@ def create_build_plan(
             support_activity_id=support_activity.id,
             build_description_id=build_desc.id,
             status=status,
+            is_imported=True,
         )
         session.add(build_plan)
         session.flush()

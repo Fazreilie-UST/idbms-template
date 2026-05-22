@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   Alert,
   Breadcrumb,
@@ -40,6 +40,15 @@ function statusTag(status) {
 export default function BuildRequestView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Navigation to a sibling revision must stay within the same mount
+  // point (e.g. /pm/build-requests, /requestor/build-requests,
+  // /build-request-tracker). React Router's default relative="route"
+  // resolves `..` against the route tree, which for these flat routes
+  // collapses to `/` and breaks the link. Build the absolute sibling
+  // URL from the current pathname instead.
+  const basePath = location.pathname.replace(/\/[^/]*$/, "");
+  const goToBuildRequest = (targetId) => navigate(`${basePath}/${targetId}`);
   const [data, setData] = useState(null);
   const [revisions, setRevisions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -135,7 +144,7 @@ export default function BuildRequestView() {
           </Descriptions.Item>
           <Descriptions.Item label="Previous Revision">
             {data?.previous_build_request_id ? (
-              <a onClick={() => navigate(`../${data.previous_build_request_id}`)}>
+              <a onClick={() => goToBuildRequest(data.previous_build_request_id)}>
                 #{data.previous_build_request_id}
               </a>
             ) : (
@@ -159,7 +168,7 @@ export default function BuildRequestView() {
                     {statusTag(r.status)}
                     <Text>Qty: {r.quantity}</Text>
                     {r.id !== Number(id) && (
-                      <a onClick={() => navigate(`../${r.id}`)}>View #{r.id}</a>
+                      <a onClick={() => goToBuildRequest(r.id)}>View #{r.id}</a>
                     )}
                   </Space>
                   <div>

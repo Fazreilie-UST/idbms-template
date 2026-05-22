@@ -11,6 +11,7 @@ import {
   Typography,
 } from "antd";
 import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import { useBuildRequestTable } from "@/features/orders/hooks/useBuildRequestTable";
 import { fetchBuildRequestFilterOptions } from "@/features/orders/services/build_request_filter_options";
 import { getServerColumnProps } from "@/shared/components/serverColumnFilter";
@@ -34,6 +35,7 @@ const toCsv = (arr) => (Array.isArray(arr) && arr.length ? arr.join(",") : "");
 const fromCsv = (s) => (s ? String(s).split(",").filter(Boolean) : []);
 
 export default function BuildRequestTracker() {
+  const navigate = useNavigate();
   const {
     rows,
     loading,
@@ -320,6 +322,10 @@ export default function BuildRequestTracker() {
           showTotal: (t) => `Total ${t} records`,
         }}
         onChange={handleTableChange}
+        onRow={(record) => ({
+          onClick: () => navigate(`/build-request-tracker/${record.id}`),
+          style: { cursor: "pointer" },
+        })}
       />
     </Card>
   );

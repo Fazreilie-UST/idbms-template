@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, Col, Row, Select, Space, Statistic, Table, Tabs, Tag, Typography, Alert } from "antd";
+import { Card, Col, Row, Select, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography, Alert } from "antd";
 import {
   BookOutlined,
   SolutionOutlined,
@@ -105,16 +105,58 @@ export default function PMDashboard() {
     });
 
   const buildPlanCards = useMemo(() => ([
-    { title: "My Build Plans", value: plans.total, icon: <BookOutlined />, onClick: () => goToBuildPlans("my_plans") },
-    { title: "New", value: statusCounts.New, icon: <PlusCircleOutlined />, onClick: () => goToBuildPlans("New") },
-    { title: "Hold", value: statusCounts.Hold, icon: <PauseCircleOutlined />, onClick: () => goToBuildPlans("Hold") },
-    { title: "Plan", value: statusCounts.Plan, icon: <FileTextOutlined />, onClick: () => goToBuildPlans("Plan") },
-    { title: "Completed", value: statusCounts.Done, icon: <CheckCircleOutlined />, onClick: () => goToBuildPlans("Done") },
+    {
+      title: "Total Config",
+      value: plans.total,
+      icon: <BookOutlined />,
+      onClick: () => goToBuildPlans("my_plans"),
+      tooltip: "Total build config you handle. Click to view the full list filtered to your plans.",
+    },
+    {
+      title: "New",
+      value: statusCounts.New,
+      icon: <PlusCircleOutlined />,
+      onClick: () => goToBuildPlans("New"),
+      tooltip: "Your build plans in 'New' status \u2014 recently created and not yet planned. Click to view them.",
+    },
+    {
+      title: "Hold",
+      value: statusCounts.Hold,
+      icon: <PauseCircleOutlined />,
+      onClick: () => goToBuildPlans("Hold"),
+      tooltip: "Your build plans currently on hold and awaiting action. Click to view them.",
+    },
+    {
+      title: "Plan",
+      value: statusCounts.Plan,
+      icon: <FileTextOutlined />,
+      onClick: () => goToBuildPlans("Plan"),
+      tooltip: "Your build plans in 'Plan' status \u2014 actively planned and in progress. Click to view them.",
+    },
+    {
+      title: "Completed",
+      value: statusCounts.Done,
+      icon: <CheckCircleOutlined />,
+      onClick: () => goToBuildPlans("Done"),
+      tooltip: "Your build plans marked as 'Done'. Click to view completed plans.",
+    },
   ]), [plans.total, statusCounts, navigate]);
 
   const otherCards = useMemo(() => ([
-    { title: "Build Requests", value: orders.total, icon: <SolutionOutlined />, onClick: () => navigate("/pm/build-requests") },
-    { title: "Shipments", value: shipments.total, icon: <TruckOutlined />, onClick: () => navigate("/pm/shippings") },
+    {
+      title: "Build Requests",
+      value: orders.total,
+      icon: <SolutionOutlined />,
+      onClick: () => navigate("/pm/build-requests"),
+      tooltip: "Build requests tied to your build plans. Click to open the Build Requests page.",
+    },
+    {
+      title: "Shipments",
+      value: shipments.total,
+      icon: <TruckOutlined />,
+      onClick: () => navigate("/pm/shippings"),
+      tooltip: "Shipments tied to your build plans. Click to open the Shipments page.",
+    },
   ]), [orders.total, shipments.total, navigate]);
 
   const myPlansContent = (
@@ -142,9 +184,11 @@ export default function PMDashboard() {
             <Row gutter={[12, 12]}>
               {buildPlanCards.map((c) => (
                 <Col xs={12} sm={8} key={c.title}>
-                  <Card hoverable onClick={c.onClick} loading={loading} size="small">
-                    <Statistic title={c.title} value={c.value} prefix={c.icon} />
-                  </Card>
+                  <Tooltip title={c.tooltip} placement="top" mouseEnterDelay={0.2}>
+                    <Card hoverable onClick={c.onClick} loading={loading} size="small">
+                      <Statistic title={c.title} value={c.value} prefix={c.icon} />
+                    </Card>
+                  </Tooltip>
                 </Col>
               ))}
             </Row>
@@ -155,9 +199,11 @@ export default function PMDashboard() {
             <Row gutter={[12, 12]}>
               {otherCards.map((c) => (
                 <Col xs={12} key={c.title}>
-                  <Card hoverable onClick={c.onClick} loading={loading} size="small">
-                    <Statistic title={c.title} value={c.value} prefix={c.icon} />
-                  </Card>
+                  <Tooltip title={c.tooltip} placement="top" mouseEnterDelay={0.2}>
+                    <Card hoverable onClick={c.onClick} loading={loading} size="small">
+                      <Statistic title={c.title} value={c.value} prefix={c.icon} />
+                    </Card>
+                  </Tooltip>
                 </Col>
               ))}
             </Row>

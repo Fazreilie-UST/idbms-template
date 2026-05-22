@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Table,
   Input,
@@ -464,6 +464,10 @@ export default function BuildPlanTable({
   const [tableKey, setTableKey] = useState(0);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const buildPlanViewBase = location.pathname.startsWith("/build-plan-tracker")
+    ? "/build-plan-tracker"
+    : "/pm/build-plans";
 
   const [searchInput, setSearchInput] = useState(filters?.search || "");
   const [familyInput, setFamilyInput] = useState(
@@ -534,7 +538,7 @@ export default function BuildPlanTable({
             style={{ padding: 0 }}
             onClick={(event) => {
               event.stopPropagation();
-              navigate(`/pm/build-plans/${record.build_plan_id}`);
+              navigate(`${buildPlanViewBase}/${record.build_plan_id}`);
             }}
           >
             {value || "-"}
@@ -704,7 +708,7 @@ export default function BuildPlanTable({
         }),
       },
     ],
-    [filterOptions, updateFilters, filters, navigate]
+    [filterOptions, updateFilters, filters, navigate, buildPlanViewBase]
   );
 
   const columns = allColumns

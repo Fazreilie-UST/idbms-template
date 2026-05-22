@@ -114,12 +114,9 @@ export default function Login() {
           </Form.Item>
 
           <Form.Item>
-            <Flex justify="space-between" align="center">
-              <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox>Remember me</Checkbox>
-              </Form.Item>
-              <a href="/">Forgot password</a>
-            </Flex>
+            <Form.Item name="remember" valuePropName="checked" noStyle>
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
           </Form.Item>
 
           <Form.Item>

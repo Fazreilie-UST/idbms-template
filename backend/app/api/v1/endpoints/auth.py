@@ -22,19 +22,15 @@ from app.core.config import settings
 from app.models.auth.user import User
 from app.models.auth.role import Role
 from app.models.auth.refresh_token import RefreshToken
-from app.models.auth.password_reset_token import PasswordResetToken
 from app.schemas.auth.auth import (
     LoginRequest,
     TokenResponse,
     RefreshTokenRequest,
-    ForgotPasswordRequest,
-    ResetPasswordRequest,
     ChangePasswordRequest,
 )
 from app.schemas.auth.user import UserResponse
 from app.schemas.auth.session import SessionResponse
 from app.services.rbac_service import RBACService
-from app.services.email_service import EmailService
 
 
 router = APIRouter()
@@ -422,137 +418,6 @@ def logout(
 @router.get("/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
-
-
-@router.post("/forgot-password")
-@limiter.limit(settings.RATE_LIMIT_PASSWORD_RESET)
-def forgot_password(
-    request: Request,
-    data: ForgotPasswordRequest,
-    db: Session = Depends(get_db),
-):
-    generic_response = {
-        "message": "If the email exists, a reset link has been sent."
-    }
-
-    user = db.query(User).filter(User.email == data.email).first()
-
-    if not user:
-        security_logger.warning(
-            "Password reset requested for unknown email=%s",
-            data.email,
-        )
-        return generic_response
-
-    if not user.can_login:
-        security_logger.warning(
-            "Password reset blocked: user_id=%s reason=cannot_login",
-            user.id,
-        )
-        return generic_response
-
-    raw_token = generate_secure_token()
-
-    reset_token = PasswordResetToken(
-        user_id=user.id,
-        token_hash=hash_token(raw_token),
-        expires_at=utc_now()
-        + timedelta(minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES),
-        used=False,
-    )
-
-    db.add(reset_token)
-    db.commit()
-
-    reset_link = f"{settings.PASSWORD_RESET_FRONTEND_URL}?token={raw_token}"
-
-    try:
-        EmailService.send_password_reset_email(
-            to_email=user.email,
-            reset_link=reset_link,
-        )
-    except Exception:
-        security_logger.exception(
-            "Password reset email failed: user_id=%s",
-            user.id,
-        )
-
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to send password reset email",
-        )
-
-    security_logger.info(
-        "Password reset email sent: user_id=%s",
-        user.id,
-    )
-
-    return generic_response
-
-
-@router.post("/reset-password")
-def reset_password(
-    data: ResetPasswordRequest,
-    db: Session = Depends(get_db),
-):
-    token_hash = hash_token(data.token)
-
-    reset_token = (
-        db.query(PasswordResetToken)
-        .filter(
-            PasswordResetToken.token_hash == token_hash,
-            PasswordResetToken.used == False,
-        )
-        .first()
-    )
-
-    if not reset_token:
-        security_logger.warning("Password reset failed: invalid token")
-        raise HTTPException(status_code=400, detail="Invalid reset token")
-
-    if reset_token.expires_at < utc_now():
-        security_logger.warning(
-            "Password reset failed: reset_token_id=%s reason=expired",
-            reset_token.id,
-        )
-        raise HTTPException(status_code=400, detail="Reset token expired")
-
-    user = db.query(User).filter(User.id == reset_token.user_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    if not user.email or not user.can_login:
-        security_logger.warning(
-            "Password reset failed: user_id=%s reason=user_cannot_login",
-            user.id,
-        )
-        raise HTTPException(status_code=400, detail="User cannot reset password")
-
-    user.password_hash = hash_password(data.new_password)
-    user.token_version += 1
-    user.is_active = True
-    user.can_login = True
-    reset_token.used = True
-
-    db.query(RefreshToken).filter(
-        RefreshToken.user_id == user.id,
-        RefreshToken.revoked == False,
-    ).update(
-        {
-            "revoked": True,
-            "revoked_at": utc_now(),
-        }
-    )
-
-    db.commit()
-
-    audit_logger.info(
-        "Password reset completed: user_id=%s",
-        user.id,
-    )
-
-    return {"message": "Password reset successfully"}
 
 
 @router.post("/change-password")

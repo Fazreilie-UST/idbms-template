@@ -489,7 +489,6 @@ _USER_FK_TABLES: list[tuple[str, str, list[str]]] = [
     # auth
     ("user_roles", "user_id", ["role_id"]),
     ("refresh_tokens", "user_id", []),
-    ("password_reset_tokens", "user_id", []),
     # order
     ("user_build_requests", "requestor_id", ["build_request_id"]),
     ("build_requests", "requestor_id", []),

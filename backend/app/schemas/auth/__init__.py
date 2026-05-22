@@ -10,8 +10,6 @@ from app.schemas.auth.auth import (
     LoginRequest,
     TokenResponse,
     RefreshTokenRequest,
-    ForgotPasswordRequest,
-    ResetPasswordRequest,
     ChangePasswordRequest,
 )
 
@@ -24,7 +22,5 @@ __all__ = [
     "LoginRequest",
     "TokenResponse",
     "RefreshTokenRequest",
-    "ForgotPasswordRequest",
-    "ResetPasswordRequest",
     "ChangePasswordRequest",
 ]

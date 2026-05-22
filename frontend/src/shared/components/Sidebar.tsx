@@ -140,6 +140,12 @@ export default function Sidebar() {
     if (location.pathname.startsWith("/pm/shippings/")) return "/pm/shippings";
     if (location.pathname.startsWith("/requestor/build-requests/"))
       return "/requestor/build-requests";
+    if (location.pathname.startsWith("/build-plan-tracker/"))
+      return "/build-plan-tracker";
+    if (location.pathname.startsWith("/build-request-tracker/"))
+      return "/build-request-tracker";
+    if (location.pathname.startsWith("/shipment-tracker/"))
+      return "/shipment-tracker";
     return location.pathname;
   }, [location.pathname]);
 

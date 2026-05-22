@@ -21,7 +21,6 @@ class Settings(BaseSettings):
 
     # 🔐 Auth config
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    PASSWORD_RESET_EXPIRE_MINUTES: int = 30
     MAX_FAILED_LOGIN_ATTEMPTS: int = 5
     LOGIN_LOCK_MINUTES: int = 15
 
@@ -30,7 +29,6 @@ class Settings(BaseSettings):
     RATE_LIMIT_STORAGE_URI: str = os.getenv("RATE_LIMIT_STORAGE_URI", "redis://localhost:6379/0")
     RATE_LIMIT_LOGIN: str = os.getenv("RATE_LIMIT_LOGIN", "5/minute")
     RATE_LIMIT_REFRESH: str = os.getenv("RATE_LIMIT_REFRESH", "20/minute")
-    RATE_LIMIT_PASSWORD_RESET: str = os.getenv("RATE_LIMIT_PASSWORD_RESET", "3/hour")
     
     # 🍪 Cookie config
     REFRESH_COOKIE_NAME: str = "refresh_token"
@@ -49,21 +47,7 @@ class Settings(BaseSettings):
         os.getenv("MAX_REQUEST_BODY_BYTES", str(100 * 1024 * 1024))  # 100 MB
     )
 
-    # 📧 Email
-    SMTP_HOST: str = os.getenv("SMTP_HOST", "smtpauth.intel.com")
-    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
-    SMTP_USERNAME: str = os.getenv("SMTP_USERNAME", "")
-    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
-    SMTP_FROM_EMAIL: str = os.getenv("SMTP_FROM_EMAIL", "npi-dbms@intel.com")
-    SMTP_FROM_NAME: str = os.getenv("SMTP_FROM_NAME", "NPI DBMS")
-    SMTP_USE_TLS: bool = os.getenv("SMTP_USE_TLS", "false").lower() == "true"
-
-    PASSWORD_RESET_FRONTEND_URL: str = os.getenv(
-        "PASSWORD_RESET_FRONTEND_URL",
-        "http://localhost:5173/reset-password",
-    )
-
-    # 📁 Build plan bulk import storage (Excel files uploaded by PM)
+    #  Build plan bulk import storage (Excel files uploaded by PM)
     BUILD_PLAN_IMPORT_DIR: str = os.getenv(
         "BUILD_PLAN_IMPORT_DIR",
         "/home/fbinalex/NPI-IDBMS/db/build-plans",

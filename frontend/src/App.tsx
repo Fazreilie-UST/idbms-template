@@ -112,7 +112,12 @@ function App() {
             >
               <Route element={<MainLayout />}>
                 <Route path="/build-plan-tracker" element={<BuildPlanTracker />} />
+                <Route path="/build-plan-tracker/:id" element={<BuildplanView />} />
                 <Route path="/build-request-tracker" element={<BuildRequestTracker />} />
+                <Route
+                  path="/build-request-tracker/:id"
+                  element={<BuildRequestView />}
+                />
                 <Route path="/shipment-tracker" element={<ShippingTracker />} />
                 <Route path="/account" element={<AccountSettings />} />
               </Route>

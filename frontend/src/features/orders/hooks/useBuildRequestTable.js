@@ -7,6 +7,7 @@ const DEFAULT_FILTERS = {
   family: "",
   form_factor: "",
   requestor: "",
+  config_number: "",
   my_orders: false,
   my_plans: false,
 };

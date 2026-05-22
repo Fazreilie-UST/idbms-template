@@ -108,6 +108,7 @@ def list_build_requests(
     family: Optional[str] = None,
     form_factor: Optional[str] = None,
     requestor: Optional[str] = None,
+    config_number: Optional[str] = None,
     sort_by: Optional[str] = None,
     sort_order: Optional[str] = None,
     my_orders: bool,
@@ -223,6 +224,13 @@ def list_build_requests(
             _ensure_form_factor()
             q = q.filter(FormFactor.name.in_(ffs))
 
+    if config_number:
+        configs = _split_csv(config_number)
+        if configs:
+            _ensure_cfg()
+            conds = [ConfigNumber.value.ilike(f"%{c}%") for c in configs]
+            q = q.filter(or_(*conds))
+
     if requestor:
         # Match by user id (csv) or by full_name/email (case-insensitive).
         tokens = _split_csv(requestor)
@@ -264,52 +272,68 @@ def list_build_requests(
 
     total = q.count()
 
-    # Sorting
-    sort_key = (sort_by or "id").lower()
-    sort_col = _SORT_COLUMN_MAP.get(sort_key, BuildRequest.id)
-    extra_order: list = []
-    if sort_key == "family":
-        _ensure_family()
-        sort_col = Family.code
-    elif sort_key in ("form_factor", "formfactor"):
-        _ensure_form_factor()
-        sort_col = FormFactor.name
-    elif sort_key == "requestor":
-        _ensure_requestor()
-        sort_col = User.full_name
-    elif sort_key == "config_number":
-        _ensure_cfg()
-        sort_col = ConfigNumber.value
-    elif sort_key == "build_plan_recency":
-        # Order by latest linked build plan's (year, work_week) — used by
-        # the PM dashboard "Recent Build Requests" tile.
-        year_subq = (
-            select(func.max(BuildPlan.year))
-            .select_from(BuildPlanBuildRequest)
-            .join(BuildPlan, BuildPlan.id == BuildPlanBuildRequest.build_plan_id)
-            .where(BuildPlanBuildRequest.build_request_id == BuildRequest.id)
-            .correlate(BuildRequest)
-            .scalar_subquery()
-        )
-        ww_subq = (
-            select(func.max(BuildPlan.work_week))
-            .select_from(BuildPlanBuildRequest)
-            .join(BuildPlan, BuildPlan.id == BuildPlanBuildRequest.build_plan_id)
-            .where(
-                BuildPlanBuildRequest.build_request_id == BuildRequest.id,
-                BuildPlan.year == year_subq,
-            )
-            .correlate(BuildRequest)
-            .scalar_subquery()
-        )
-        sort_col = year_subq
-        extra_order.append(ww_subq.desc() if (sort_order or "desc").lower() != "asc" else ww_subq.asc())
+    # Sorting — supports multi-column (CSV) ``sort_by`` / ``sort_order``.
+    sort_keys = _split_csv(sort_by) or ["id"]
+    sort_orders = _split_csv(sort_order)
+    order_clauses: list = []
 
-    desc = (sort_order or "desc").lower() != "asc"
-    order_clause = sort_col.desc() if desc else sort_col.asc()
+    def _resolve_sort(key: str):
+        """Return a SQLAlchemy column/expression for `key`, joining as needed.
+
+        For ``build_plan_recency``, returns a tuple ``(year_subq, ww_subq)``
+        so the caller can append both clauses in the proper direction.
+        """
+        k = (key or "id").lower()
+        if k == "family":
+            _ensure_family()
+            return Family.code
+        if k in ("form_factor", "formfactor"):
+            _ensure_form_factor()
+            return FormFactor.name
+        if k == "requestor":
+            _ensure_requestor()
+            return User.full_name
+        if k == "config_number":
+            _ensure_cfg()
+            return ConfigNumber.value
+        if k == "build_plan_recency":
+            year_subq = (
+                select(func.max(BuildPlan.year))
+                .select_from(BuildPlanBuildRequest)
+                .join(BuildPlan, BuildPlan.id == BuildPlanBuildRequest.build_plan_id)
+                .where(BuildPlanBuildRequest.build_request_id == BuildRequest.id)
+                .correlate(BuildRequest)
+                .scalar_subquery()
+            )
+            ww_subq = (
+                select(func.max(BuildPlan.work_week))
+                .select_from(BuildPlanBuildRequest)
+                .join(BuildPlan, BuildPlan.id == BuildPlanBuildRequest.build_plan_id)
+                .where(
+                    BuildPlanBuildRequest.build_request_id == BuildRequest.id,
+                    BuildPlan.year == year_subq,
+                )
+                .correlate(BuildRequest)
+                .scalar_subquery()
+            )
+            return (year_subq, ww_subq)
+        return _SORT_COLUMN_MAP.get(k, BuildRequest.id)
+
+    for idx, key in enumerate(sort_keys):
+        order = sort_orders[idx] if idx < len(sort_orders) else "desc"
+        is_asc = (order or "desc").lower() == "asc"
+        resolved = _resolve_sort(key)
+        if isinstance(resolved, tuple):
+            for col in resolved:
+                order_clauses.append(col.asc() if is_asc else col.desc())
+        else:
+            order_clauses.append(resolved.asc() if is_asc else resolved.desc())
+
     # Stable secondary order
+    order_clauses.append(BuildRequest.id.desc())
+
     rows = (
-        q.order_by(order_clause, *extra_order, BuildRequest.id.desc())
+        q.order_by(*order_clauses)
         .offset((page - 1) * page_size)
         .limit(page_size)
         .all()

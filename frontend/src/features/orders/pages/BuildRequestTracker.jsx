@@ -1,8 +1,20 @@
-import { useEffect, useState } from "react";
-import { Card, Input, Space, Table, Tag, Typography, Alert, Select } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Alert,
+  Button,
+  Card,
+  Input,
+  Select,
+  Space,
+  Table,
+  Tag,
+  Typography,
+} from "antd";
+import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useBuildRequestTable } from "@/features/orders/hooks/useBuildRequestTable";
 import { fetchBuildRequestFilterOptions } from "@/features/orders/services/build_request_filter_options";
+import { getServerColumnProps } from "@/shared/components/serverColumnFilter";
+import { sortOrderFor } from "@/shared/hooks/usePaginatedTable";
 
 const { Title } = Typography;
 
@@ -18,6 +30,9 @@ const STATUS_COLORS = {
   Completed: "success",
 };
 
+const toCsv = (arr) => (Array.isArray(arr) && arr.length ? arr.join(",") : "");
+const fromCsv = (s) => (s ? String(s).split(",").filter(Boolean) : []);
+
 export default function BuildRequestTracker() {
   const {
     rows,
@@ -25,9 +40,11 @@ export default function BuildRequestTracker() {
     error,
     pagination,
     filters,
-    sort,
+    sorts,
     updateFilters,
+    resetAllFilters,
     handleTableChange,
+    loadData,
   } = useBuildRequestTable();
 
   const [options, setOptions] = useState({
@@ -43,10 +60,45 @@ export default function BuildRequestTracker() {
       .catch(() => {});
   }, []);
 
-  function sortedFor(field) {
-    if (sort?.sort_by !== field) return null;
-    return sort.sort_order === "asc" ? "ascend" : "descend";
+  // Buffered top-toolbar inputs — only push to server on Apply
+  const [searchInput, setSearchInput] = useState(filters.search || "");
+  const [familyInput, setFamilyInput] = useState(fromCsv(filters.family));
+  const [formFactorInput, setFormFactorInput] = useState(
+    fromCsv(filters.form_factor)
+  );
+  const [requestorInput, setRequestorInput] = useState(
+    fromCsv(filters.requestor)
+  );
+  const [statusInput, setStatusInput] = useState(fromCsv(filters.status));
+
+  function applyTopFilters(overrides = {}) {
+    updateFilters({
+      search: searchInput,
+      family: toCsv(familyInput),
+      form_factor: toCsv(formFactorInput),
+      requestor: toCsv(requestorInput),
+      status: toCsv(statusInput),
+      ...overrides,
+    });
   }
+
+  function handleReset() {
+    setSearchInput("");
+    setFamilyInput([]);
+    setFormFactorInput([]);
+    setRequestorInput([]);
+    setStatusInput([]);
+    resetAllFilters();
+  }
+
+  const requestorOptions = useMemo(
+    () =>
+      (options.requestors || []).map((u) => ({
+        label: u.label || u.full_name || u.email || `#${u.id}`,
+        value: String(u.id),
+      })),
+    [options.requestors]
+  );
 
   const columns = [
     {
@@ -54,32 +106,53 @@ export default function BuildRequestTracker() {
       dataIndex: "id",
       key: "id",
       width: 80,
-      sorter: true,
-      sortOrder: sortedFor("id"),
-      defaultSortOrder: "descend",
+      sorter: { multiple: 1 },
+      sortOrder: sortOrderFor(sorts, "id"),
     },
     {
       title: "Config Number",
       dataIndex: "config_number",
       key: "config_number",
-      sorter: true,
-      sortOrder: sortedFor("config_number"),
+      sortOrder: sortOrderFor(sorts, "config_number"),
+      ...getServerColumnProps({
+        dataIndex: "config_number",
+        title: "Config Number",
+        updateFilters,
+        filters,
+        filterOptions: [],
+        sortable: { multiple: 2 },
+      }),
       render: (v) => v || "\u2014",
     },
     {
       title: "Family",
       dataIndex: "family_code",
       key: "family",
-      sorter: true,
-      sortOrder: sortedFor("family"),
+      sortOrder: sortOrderFor(sorts, "family"),
+      ...getServerColumnProps({
+        dataIndex: "family_code",
+        filterKey: "family",
+        title: "Family",
+        updateFilters,
+        filters,
+        filterOptions: options.families || [],
+        sortable: { multiple: 3 },
+      }),
       render: (v) => v || "\u2014",
     },
     {
       title: "Form Factor",
       dataIndex: "form_factor",
       key: "form_factor",
-      sorter: true,
-      sortOrder: sortedFor("form_factor"),
+      sortOrder: sortOrderFor(sorts, "form_factor"),
+      ...getServerColumnProps({
+        dataIndex: "form_factor",
+        title: "Form Factor",
+        updateFilters,
+        filters,
+        filterOptions: options.form_factors || [],
+        sortable: { multiple: 4 },
+      }),
       render: (v) => v || "\u2014",
     },
     {
@@ -87,16 +160,16 @@ export default function BuildRequestTracker() {
       dataIndex: "quantity",
       key: "quantity",
       width: 110,
-      sorter: true,
-      sortOrder: sortedFor("quantity"),
+      sorter: { multiple: 5 },
+      sortOrder: sortOrderFor(sorts, "quantity"),
     },
     {
       title: "Revision",
       dataIndex: "revision",
       key: "revision",
       width: 110,
-      sorter: true,
-      sortOrder: sortedFor("revision"),
+      sorter: { multiple: 6 },
+      sortOrder: sortOrderFor(sorts, "revision"),
       render: (v) => `rev${v ?? 1}`,
     },
     {
@@ -104,98 +177,124 @@ export default function BuildRequestTracker() {
       dataIndex: "status",
       key: "status",
       width: 160,
-      sorter: true,
-      sortOrder: sortedFor("status"),
+      sortOrder: sortOrderFor(sorts, "status"),
+      ...getServerColumnProps({
+        dataIndex: "status",
+        title: "Status",
+        updateFilters,
+        filters,
+        filterOptions: options.statuses || [],
+        sortable: { multiple: 7 },
+      }),
       render: (s) => <Tag color={STATUS_COLORS[s] || "default"}>{s}</Tag>,
     },
     {
       title: "Requestor",
       key: "requestor",
-      sorter: true,
-      sortOrder: sortedFor("requestor"),
+      sortOrder: sortOrderFor(sorts, "requestor"),
+      ...getServerColumnProps({
+        dataIndex: "requestor",
+        title: "Requestor",
+        updateFilters,
+        filters,
+        filterOptions: requestorOptions,
+        sortable: { multiple: 8 },
+      }),
       render: (_, r) =>
         r.requestor?.full_name || r.requestor?.email || `#${r.requestor_id}`,
     },
   ];
 
-  const toCsv = (arr) => (Array.isArray(arr) && arr.length ? arr.join(",") : "");
-  const fromCsv = (s) => (s ? String(s).split(",").filter(Boolean) : []);
-
   return (
     <Card>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-          gap: 12,
-          flexWrap: "wrap",
-        }}
-      >
-        <Title level={3} style={{ margin: 0 }}>
-          Build Request Tracker
-        </Title>
-        <Space wrap>
-          <Input
-            allowClear
-            prefix={<SearchOutlined />}
-            placeholder="Search (config #, family, requestor\u2026)"
-            value={filters.search}
-            onChange={(e) => updateFilters({ search: e.target.value })}
-            style={{ width: 280 }}
-          />
-        </Space>
-      </div>
+      <Title level={3}>Build Request Tracker</Title>
 
-      <Space wrap style={{ marginBottom: 16 }}>
-        <Select
-          mode="multiple"
+      <Space style={{ marginBottom: 16 }} wrap>
+        <Input.Search
+          placeholder="Search (config #, family, requestor\u2026)"
           allowClear
-          placeholder="Status"
-          style={{ minWidth: 200 }}
-          value={fromCsv(filters.status)}
-          onChange={(v) => updateFilters({ status: toCsv(v) })}
-          options={(options.statuses || []).map((s) => ({ value: s, label: s }))}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onSearch={(value) => {
+            setSearchInput(value);
+            applyTopFilters({ search: value });
+          }}
+          style={{ width: 360 }}
         />
+
         <Select
           mode="multiple"
           allowClear
+          showSearch
           placeholder="Family"
-          style={{ minWidth: 200 }}
-          value={fromCsv(filters.family)}
-          onChange={(v) => updateFilters({ family: toCsv(v) })}
-          options={(options.families || []).map((s) => ({ value: s, label: s }))}
+          value={familyInput}
+          onChange={setFamilyInput}
+          maxTagCount="responsive"
+          style={{ width: 220 }}
+          options={(options.families || []).map((s) => ({
+            value: s,
+            label: s,
+          }))}
         />
+
         <Select
           mode="multiple"
           allowClear
+          showSearch
           placeholder="Form Factor"
-          style={{ minWidth: 200 }}
-          value={fromCsv(filters.form_factor)}
-          onChange={(v) => updateFilters({ form_factor: toCsv(v) })}
+          value={formFactorInput}
+          onChange={setFormFactorInput}
+          maxTagCount="responsive"
+          style={{ width: 220 }}
           options={(options.form_factors || []).map((s) => ({
             value: s,
             label: s,
           }))}
         />
+
         <Select
           mode="multiple"
           allowClear
+          showSearch
           placeholder="Requestor"
-          style={{ minWidth: 240 }}
-          value={fromCsv(filters.requestor).map((x) =>
-            Number.isNaN(Number(x)) ? x : Number(x),
-          )}
-          onChange={(v) => updateFilters({ requestor: toCsv(v) })}
-          options={(options.requestors || []).map((u) => ({
-            value: u.id,
-            label: u.label || u.full_name || u.email || `#${u.id}`,
-          }))}
+          value={requestorInput}
+          onChange={setRequestorInput}
+          maxTagCount="responsive"
+          style={{ width: 240 }}
+          options={requestorOptions}
           filterOption={(input, option) =>
             (option?.label || "").toLowerCase().includes(input.toLowerCase())
           }
         />
+
+        <Select
+          mode="multiple"
+          allowClear
+          showSearch
+          placeholder="Status"
+          value={statusInput}
+          onChange={setStatusInput}
+          maxTagCount="responsive"
+          style={{ width: 220 }}
+          options={(options.statuses || []).map((s) => ({
+            value: s,
+            label: s,
+          }))}
+        />
+
+        <Button
+          type="primary"
+          icon={<SearchOutlined />}
+          onClick={() => applyTopFilters()}
+        >
+          Apply
+        </Button>
+
+        <Button onClick={handleReset}>Reset</Button>
+
+        <Button icon={<ReloadOutlined />} onClick={() => loadData()}>
+          Refresh
+        </Button>
       </Space>
 
       {error && (

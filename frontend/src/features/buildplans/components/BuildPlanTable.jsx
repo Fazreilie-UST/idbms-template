@@ -456,6 +456,7 @@ export default function BuildPlanTable({
   selectedRowKeys = [],
   onSelectionChange,
   toolbarExtra = null,
+  hideStatusColumn = false,
 }) {
   const [columnDrawerOpen, setColumnDrawerOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(DEFAULT_VISIBLE_COLUMNS);
@@ -706,20 +707,25 @@ export default function BuildPlanTable({
     [filterOptions, updateFilters, filters, navigate]
   );
 
-  const columns = allColumns.filter((col) => visibleColumns.includes(col.key));
+  const columns = allColumns
+    .filter((col) => visibleColumns.includes(col.key))
+    .filter((col) => !(hideStatusColumn && col.key === "status"));
 
   function onTableChange(paginationInfo, tableFilters, sorter) {
     handleTableChange(paginationInfo, tableFilters, sorter);
   }
 
   function applyTopFilters(overrides = {}) {
-    updateFilters({
+    const patch = {
       search: searchInput,
       family_code: familyInput.join(","),
       form_factor: formFactorInput.join(","),
-      status: statusInput.join(","),
       ...overrides,
-    });
+    };
+    if (!hideStatusColumn) {
+      patch.status = statusInput.join(",");
+    }
+    updateFilters(patch);
   }
 
   return (
@@ -761,17 +767,19 @@ export default function BuildPlanTable({
           options={safeOptions(resolvedFilterOptions.form_factor)}
         />
 
-        <Select
-          mode="multiple"
-          allowClear
-          showSearch
-          placeholder="Status"
-          value={statusInput}
-          onChange={(values) => setStatusInput(values)}
-          maxTagCount="responsive"
-          style={{ width: 220 }}
-          options={safeOptions(resolvedFilterOptions.status)}
-        />
+        {!hideStatusColumn && (
+          <Select
+            mode="multiple"
+            allowClear
+            showSearch
+            placeholder="Status"
+            value={statusInput}
+            onChange={(values) => setStatusInput(values)}
+            maxTagCount="responsive"
+            style={{ width: 220 }}
+            options={safeOptions(resolvedFilterOptions.status)}
+          />
+        )}
 
         <Button type="primary" icon={<SearchOutlined />} onClick={applyTopFilters}>
           Apply
@@ -878,7 +886,9 @@ export default function BuildPlanTable({
             Show all
           </Checkbox>
 
-          {allColumns.map((col) => (
+          {allColumns
+            .filter((col) => !(hideStatusColumn && col.key === "status"))
+            .map((col) => (
             <Checkbox
               key={col.key}
               checked={visibleColumns.includes(col.key)}

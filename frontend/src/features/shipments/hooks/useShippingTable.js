@@ -4,6 +4,11 @@ import { usePaginatedTable } from "@/shared/hooks/usePaginatedTable";
 const DEFAULT_FILTERS = {
   search: "",
   status: "",
+  family: "",
+  forwarder: "",
+  handler: "",
+  recipient: "",
+  config_number: "",
 };
 
 export function useShippingTable(initialFilters = {}) {

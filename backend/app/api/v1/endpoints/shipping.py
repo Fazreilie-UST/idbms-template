@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, or_, select, bindparam, text
+from sqlalchemy import func, or_, select, bindparam, text, tuple_
 from sqlalchemy.orm import Session, joinedload
 
 from app.db.deps import get_db
@@ -12,6 +12,7 @@ from app.models.order.forwarder import Forwarder
 from app.models.build.build_plan import BuildPlan
 from app.models.build.build_plan_access import AccessTypeEnum, BuildPlanAccess
 from app.models.build.build_plan_access_override import BuildPlanAccessOverride
+from app.models.build.build_plan_shipping import BuildPlanShipping
 from app.models.build.config_number import ConfigNumber
 from app.models.build.family import Family
 from app.models.build.family_form_factor import FamilyFormFactor
@@ -129,8 +130,12 @@ def list_shippings(
     search: Optional[str] = None,
     status: Optional[str] = None,
     family: Optional[str] = None,
+    forwarder: Optional[str] = None,
+    handler: Optional[str] = None,
+    recipient: Optional[str] = None,
+    config_number: Optional[str] = None,
     sort_by: Optional[str] = Query(None),
-    sort_order: Optional[str] = Query(None, pattern="^(asc|desc)$"),
+    sort_order: Optional[str] = Query(None),
     my_plans: bool = Query(
         False,
         description=(
@@ -173,6 +178,96 @@ def list_shippings(
                 .subquery()
             )
             q = q.filter(Shipping.config_number_id.in_(family_cfg_subq))
+
+    if config_number:
+        cfg_values = [c.strip() for c in config_number.split(",") if c.strip()]
+        if cfg_values:
+            cfg_filter_subq = (
+                db.query(ConfigNumber.id)
+                .filter(or_(*[ConfigNumber.value.ilike(f"%{c}%") for c in cfg_values]))
+                .subquery()
+            )
+            q = q.filter(Shipping.config_number_id.in_(cfg_filter_subq))
+
+    if forwarder:
+        forwarder_names = [
+            f.strip() for f in forwarder.split(",") if f.strip()
+        ]
+        if forwarder_names:
+            fwd_subq = (
+                db.query(Forwarder.id)
+                .filter(Forwarder.name.in_(forwarder_names))
+                .subquery()
+            )
+            q = q.filter(Shipping.forwarder_id.in_(fwd_subq))
+
+    if handler:
+        handler_ids: list[int] = []
+        handler_names: list[str] = []
+        for tok in (t.strip() for t in handler.split(",")):
+            if not tok:
+                continue
+            if tok.isdigit():
+                handler_ids.append(int(tok))
+            else:
+                handler_names.append(tok)
+        conds = []
+        if handler_ids:
+            conds.append(Shipping.recipient_user_id.in_(handler_ids))
+        if handler_names:
+            name_subq = (
+                db.query(User.id)
+                .filter(
+                    or_(*[User.full_name.ilike(f"%{n}%") for n in handler_names])
+                )
+                .subquery()
+            )
+            conds.append(Shipping.recipient_user_id.in_(name_subq))
+        if conds:
+            q = q.filter(or_(*conds))
+
+    if recipient:
+        recipient_ids: list[int] = []
+        recipient_names: list[str] = []
+        for tok in (t.strip() for t in recipient.split(",")):
+            if not tok:
+                continue
+            if tok.isdigit():
+                recipient_ids.append(int(tok))
+            else:
+                recipient_names.append(tok)
+        target_user_conds = []
+        if recipient_ids:
+            target_user_conds.append(User.id.in_(recipient_ids))
+        for n in recipient_names:
+            target_user_conds.append(User.full_name.ilike(f"%{n}%"))
+        if target_user_conds:
+            target_user_subq = (
+                db.query(User.id).filter(or_(*target_user_conds)).subquery()
+            )
+            # (config_number_id, recipient_user_id) pairs whose
+            # build_plan_shippings include any of the target requestor ids.
+            pair_subq = (
+                db.query(
+                    BuildPlan.config_number_id.label("cfg"),
+                    BuildPlanShipping.recipient_user_id.label("rcv"),
+                )
+                .join(
+                    BuildPlanShipping,
+                    BuildPlanShipping.build_plan_id == BuildPlan.id,
+                )
+                .filter(
+                    BuildPlan.config_number_id.isnot(None),
+                    BuildPlanShipping.requestor_user_id.in_(target_user_subq),
+                )
+                .distinct()
+                .subquery()
+            )
+            q = q.filter(
+                tuple_(
+                    Shipping.config_number_id, Shipping.recipient_user_id
+                ).in_(select(pair_subq.c.cfg, pair_subq.c.rcv))
+            )
 
     if my_plans:
         family_owned_subq = (
@@ -226,7 +321,7 @@ def list_shippings(
             Forwarder.name.ilike(like),
         ))
 
-    # Sorting
+    # Sorting (supports multi-sort via comma-separated sort_by/sort_order)
     sort_map = {
         "id": Shipping.id,
         "quantity": Shipping.quantity,
@@ -236,56 +331,64 @@ def list_shippings(
         "status": Shipping.status,
         "tracking_number": Shipping.tracking_number,
     }
-    key = (sort_by or "id").lower()
-    sort_col = sort_map.get(key, Shipping.id)
-    extra_order: list = []
-    if key == "config_number":
-        if not cfg_joined:
-            q = q.outerjoin(ConfigNumber, Shipping.config_number_id == ConfigNumber.id)
-            cfg_joined = True
-        sort_col = ConfigNumber.value
-    elif key in ("handler", "recipient_user", "recipient"):
-        # "Handler" and "Recipient" both refer to the single
-        # ``recipient_user`` column under the merged schema.
-        if not recipient_joined:
-            q = q.outerjoin(User, Shipping.recipient_user_id == User.id)
-            recipient_joined = True
-        sort_col = User.full_name
-    elif key == "forwarder":
-        if not fwd_joined:
-            q = q.outerjoin(Forwarder, Shipping.forwarder_id == Forwarder.id)
-            fwd_joined = True
-        sort_col = Forwarder.name
-    elif key == "build_plan_recency":
-        # Order by latest matching build plan's (year, work_week) — used
-        # by the PM dashboard "Recent Shipments" tile. Match via shared
-        # config_number_id.
-        year_subq = (
-            select(func.max(BuildPlan.year))
-            .where(BuildPlan.config_number_id == Shipping.config_number_id)
-            .correlate(Shipping)
-            .scalar_subquery()
-        )
-        ww_subq = (
-            select(func.max(BuildPlan.work_week))
-            .where(
-                BuildPlan.config_number_id == Shipping.config_number_id,
-                BuildPlan.year == year_subq,
-            )
-            .correlate(Shipping)
-            .scalar_subquery()
-        )
-        sort_col = year_subq
-        extra_order.append(
-            ww_subq.desc() if (sort_order or "desc").lower() != "asc" else ww_subq.asc()
-        )
 
-    desc = (sort_order or "desc").lower() != "asc"
-    order_clause = sort_col.desc() if desc else sort_col.asc()
+    def _split_csv(s: Optional[str]) -> list[str]:
+        if not s:
+            return []
+        return [tok.strip() for tok in s.split(",") if tok.strip()]
+
+    sort_keys = _split_csv(sort_by) or ["id"]
+    sort_orders = _split_csv(sort_order)
+
+    order_clauses: list = []
+    extra_order: list = []
+    for idx, raw_key in enumerate(sort_keys):
+        key = raw_key.lower()
+        order_token = (
+            sort_orders[idx] if idx < len(sort_orders) else (sort_orders[-1] if sort_orders else "desc")
+        ).lower()
+        asc = order_token == "asc"
+        sort_col = sort_map.get(key)
+        if key == "config_number":
+            if not cfg_joined:
+                q = q.outerjoin(ConfigNumber, Shipping.config_number_id == ConfigNumber.id)
+                cfg_joined = True
+            sort_col = ConfigNumber.value
+        elif key in ("handler", "recipient_user", "recipient"):
+            if not recipient_joined:
+                q = q.outerjoin(User, Shipping.recipient_user_id == User.id)
+                recipient_joined = True
+            sort_col = User.full_name
+        elif key == "forwarder":
+            if not fwd_joined:
+                q = q.outerjoin(Forwarder, Shipping.forwarder_id == Forwarder.id)
+                fwd_joined = True
+            sort_col = Forwarder.name
+        elif key == "build_plan_recency":
+            year_subq = (
+                select(func.max(BuildPlan.year))
+                .where(BuildPlan.config_number_id == Shipping.config_number_id)
+                .correlate(Shipping)
+                .scalar_subquery()
+            )
+            ww_subq = (
+                select(func.max(BuildPlan.work_week))
+                .where(
+                    BuildPlan.config_number_id == Shipping.config_number_id,
+                    BuildPlan.year == year_subq,
+                )
+                .correlate(Shipping)
+                .scalar_subquery()
+            )
+            sort_col = year_subq
+            extra_order.append(ww_subq.asc() if asc else ww_subq.desc())
+        if sort_col is None:
+            sort_col = Shipping.id
+        order_clauses.append(sort_col.asc() if asc else sort_col.desc())
 
     total = q.count()
     rows = (
-        q.order_by(order_clause, *extra_order, Shipping.id.desc())
+        q.order_by(*order_clauses, *extra_order, Shipping.id.desc())
         .offset((page - 1) * page_size)
         .limit(page_size)
         .all()
@@ -299,6 +402,99 @@ def list_shippings(
         page_size=page_size,
         total=total,
     )
+
+
+@router.get("/filter-options")
+def get_filter_options(
+    db: Session = Depends(get_db),
+    _: User = Depends(require_permission("shipping:read")),
+):
+    """Distinct filter values used to populate dropdown filters in the
+    Shipment Tracker (families, forwarders, handlers, recipients, statuses).
+    """
+    # Families: any family whose form-factor combinations have ever been
+    # linked to a shipped config_number.
+    family_rows = (
+        db.query(Family.code)
+        .join(FamilyFormFactor, FamilyFormFactor.family_id == Family.id)
+        .join(
+            BuildPlan, BuildPlan.family_form_factor_id == FamilyFormFactor.id
+        )
+        .join(Shipping, Shipping.config_number_id == BuildPlan.config_number_id)
+        .distinct()
+        .order_by(Family.code.asc())
+        .all()
+    )
+    families = [r[0] for r in family_rows if r[0]]
+
+    forwarder_rows = (
+        db.query(Forwarder.name)
+        .join(Shipping, Shipping.forwarder_id == Forwarder.id)
+        .distinct()
+        .order_by(Forwarder.name.asc())
+        .all()
+    )
+    forwarders = [r[0] for r in forwarder_rows if r[0]]
+
+    handler_rows = (
+        db.query(User.id, User.full_name, User.email)
+        .join(Shipping, Shipping.recipient_user_id == User.id)
+        .distinct()
+        .order_by(User.full_name.asc())
+        .all()
+    )
+    handlers = [
+        {
+            "id": r[0],
+            "full_name": r[1],
+            "email": r[2],
+            "label": r[1] or r[2] or f"User #{r[0]}",
+        }
+        for r in handler_rows
+    ]
+
+    # Recipients: distinct requestor users who appear in build_plan_shippings
+    # for a build plan whose config_number has an actual shipment.
+    recipient_rows = (
+        db.query(User.id, User.full_name, User.email)
+        .join(
+            BuildPlanShipping,
+            BuildPlanShipping.requestor_user_id == User.id,
+        )
+        .join(BuildPlan, BuildPlan.id == BuildPlanShipping.build_plan_id)
+        .join(
+            Shipping, Shipping.config_number_id == BuildPlan.config_number_id
+        )
+        .distinct()
+        .order_by(User.full_name.asc())
+        .all()
+    )
+    recipients = [
+        {
+            "id": r[0],
+            "full_name": r[1],
+            "email": r[2],
+            "label": r[1] or r[2] or f"User #{r[0]}",
+        }
+        for r in recipient_rows
+    ]
+
+    status_rows = db.query(Shipping.status).distinct().all()
+    statuses = sorted(
+        {
+            (s[0].value if hasattr(s[0], "value") else str(s[0]))
+            for s in status_rows
+            if s[0] is not None
+        }
+    )
+
+    return {
+        "families": families,
+        "forwarders": forwarders,
+        "handlers": handlers,
+        "recipients": recipients,
+        "statuses": statuses,
+    }
 
 
 @router.get("/{shipping_id}", response_model=ShippingResponse)

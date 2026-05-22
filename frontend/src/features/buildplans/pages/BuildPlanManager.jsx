@@ -101,6 +101,7 @@ export default function BuildPlanManager() {
         selectable
         selectedRowKeys={selectedRowKeys}
         onSelectionChange={setSelectedRowKeys}
+        hideStatusColumn={activeView !== "my_plans"}
         toolbarExtra={
           <Button
             type="primary"

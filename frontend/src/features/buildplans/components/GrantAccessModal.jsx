@@ -139,7 +139,7 @@ export default function GrantAccessModal({
       onOk={handleOk}
       okText="Grant"
       okButtonProps={{ disabled, loading: submitting }}
-      destroyOnClose
+      destroyOnHidden
       width={560}
     >
       <Space orientation="vertical" size="middle" style={{ width: "100%" }}>

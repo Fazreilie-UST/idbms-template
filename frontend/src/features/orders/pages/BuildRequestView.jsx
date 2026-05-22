@@ -161,7 +161,7 @@ export default function BuildRequestView() {
           <Timeline
             items={sortedRevisions.map((r) => ({
               color: r.id === Number(id) ? "blue" : "gray",
-              children: (
+              content: (
                 <div>
                   <Space>
                     <Text strong>rev{r.revision}</Text>

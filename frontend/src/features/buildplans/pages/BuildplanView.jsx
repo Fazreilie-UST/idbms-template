@@ -685,7 +685,7 @@ function ExtraSheetsModal({ open, buildPlanId, familyCode, formFactor, onClose }
           )}
         </Space>
       }
-      destroyOnClose
+      destroyOnHidden
     >
       {error && (
         <Alert

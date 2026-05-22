@@ -901,7 +901,7 @@ export default function BuildPlanImport() {
             ? `Edit metadata — ${editTarget.original_filename}`
             : "Edit metadata"
         }
-        destroyOnClose
+        destroyOnHidden
       >
         <Paragraph type="secondary" style={{ marginTop: 0 }}>
           Set the work-week, year, and file revision manually when the filename

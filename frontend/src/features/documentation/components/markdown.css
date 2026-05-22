@@ -1,0 +1,146 @@
+/* Styles for the in-app markdown renderer used by the Documentation page. */
+.docs-markdown {
+  line-height: 1.65;
+  color: #1f2937;
+  font-size: 14.5px;
+  text-align: left;
+  max-width: 880px; /* comfortable measure, similar to a Word page */
+}
+
+/* Clear floats so a long-floated image doesn't bleed past the next heading. */
+.docs-markdown .md-h::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.docs-markdown .md-h {
+  margin: 1.6em 0 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #0f172a;
+}
+.docs-markdown .md-h1 { font-size: 1.9em; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.3em; }
+.docs-markdown .md-h2 { font-size: 1.5em; border-bottom: 1px solid #eef2f7; padding-bottom: 0.25em; }
+.docs-markdown .md-h3 { font-size: 1.25em; }
+.docs-markdown .md-h4 { font-size: 1.08em; }
+.docs-markdown .md-h5, .docs-markdown .md-h6 { font-size: 1em; color: #475569; }
+
+.docs-markdown .md-p {
+  margin: 0.6em 0;
+  text-align: left;
+}
+
+.docs-markdown .md-ul,
+.docs-markdown .md-ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+.docs-markdown .md-ul li,
+.docs-markdown .md-ol li {
+  margin: 0.15em 0;
+}
+
+.docs-markdown .md-quote {
+  margin: 0.8em 0;
+  padding: 0.5em 1em;
+  border-left: 3px solid #94a3b8;
+  background: #f8fafc;
+  color: #475569;
+}
+
+.docs-markdown .md-pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 13px;
+  margin: 0.8em 0;
+}
+.docs-markdown .md-pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.docs-markdown .md-inline-code {
+  background: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #0f172a;
+}
+
+/* Images — flow inline by default; Word-style positioning via the alt-text
+   hint syntax `![alt|left](url)`, `![alt|right:280](url)`, etc. */
+.docs-markdown .md-img {
+  max-width: 100%;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+.docs-markdown .md-img--left {
+  float: left;
+  margin: 4px 18px 8px 0;
+  max-width: 50%;
+}
+.docs-markdown .md-img--right {
+  float: right;
+  margin: 4px 0 8px 18px;
+  max-width: 50%;
+}
+.docs-markdown .md-img--center {
+  display: block;
+  margin: 12px auto;
+}
+.docs-markdown .md-img--block {
+  display: block;
+  margin: 12px 0;
+  width: 100%;
+}
+
+/* Force every paragraph after a floated image to clear so the next block
+   starts on a fresh line — matches how Word breaks after an inline image
+   followed by a new paragraph. */
+.docs-markdown .md-hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1.5em 0;
+  clear: both;
+}
+
+.docs-markdown .md-table-wrap {
+  overflow-x: auto;
+  margin: 1em 0;
+  clear: both;
+}
+.docs-markdown .md-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13.5px;
+}
+.docs-markdown .md-table th {
+  border-bottom: 2px solid #cbd5e1;
+  padding: 6px 10px;
+  text-align: left;
+  background: #f8fafc;
+  font-weight: 600;
+  color: #0f172a;
+}
+.docs-markdown .md-table td {
+  border-bottom: 1px solid #eef2f7;
+  padding: 6px 10px;
+  vertical-align: top;
+}
+
+.docs-markdown a {
+  color: #1d4ed8;
+  text-decoration: none;
+}
+.docs-markdown a:hover {
+  text-decoration: underline;
+}
+
+.docs-markdown strong { color: #0f172a; }

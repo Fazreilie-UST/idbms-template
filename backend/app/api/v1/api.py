@@ -17,6 +17,7 @@ from app.api.v1.endpoints import (
     lookups,
     component_suppliers,
     dashboard,
+    documentation,
 )
 
 api_router = APIRouter()
@@ -37,6 +38,7 @@ api_router.include_router(build_requests.router)
 api_router.include_router(shipping.router)
 api_router.include_router(shipping_imports.router)
 api_router.include_router(dashboard.router)
+api_router.include_router(documentation.router)
 
 api_router.include_router(lookups.forwarders_router, prefix="/forwarders", tags=["Forwarders"])
 api_router.include_router(lookups.build_notes_router, prefix="/build-notes", tags=["Build Notes"])

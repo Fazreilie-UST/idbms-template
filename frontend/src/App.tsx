@@ -44,6 +44,11 @@ const DBTablesManagement = lazy(
   () => import("@/features/admin/pages/DBTablesManagement"),
 );
 
+// Documentation
+const DocumentationPage = lazy(
+  () => import("@/features/documentation/pages/DocumentationPage"),
+);
+
 function PageFallback() {
   return (
     <div
@@ -120,6 +125,7 @@ function App() {
                 />
                 <Route path="/shipment-tracker" element={<ShippingTracker />} />
                 <Route path="/account" element={<AccountSettings />} />
+                <Route path="/documentation" element={<DocumentationPage />} />
               </Route>
             </Route>
 

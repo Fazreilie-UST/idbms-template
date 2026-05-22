@@ -36,13 +36,15 @@ _BASE_HEADERS = {
 # CSP for a JSON API. The SPA is served separately; tighten origins via env if needed.
 _BASE_CSP = (
     "default-src 'none'; "
-    "frame-ancestors 'none'; "
+    "frame-ancestors 'self'; "
     "base-uri 'none'"
 )
 
 # Swagger UI / ReDoc are served by FastAPI from a CDN (jsdelivr by default).
 # They need a relaxed CSP that allows their script, style, image, and font
 # origins, plus inline init script and the favicon data URI.
+
+# Allow embedding docs in iframe from self and localhost:5173 (frontend dev server)
 _DOCS_CSP = (
     "default-src 'self'; "
     "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
@@ -51,7 +53,7 @@ _DOCS_CSP = (
     "font-src 'self' https://cdn.jsdelivr.net; "
     "connect-src 'self'; "
     "worker-src 'self' blob:; "
-    "frame-ancestors 'none'; "
+    "frame-ancestors 'self' http://localhost:5173; "
     "base-uri 'none'"
 )
 

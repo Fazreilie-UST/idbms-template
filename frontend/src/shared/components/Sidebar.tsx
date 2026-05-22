@@ -15,6 +15,7 @@ import {
   CloudUploadOutlined,
   UserOutlined,
   SafetyCertificateOutlined,
+  ReadOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/shared/store/useAuthStore";
@@ -69,6 +70,12 @@ export default function Sidebar() {
           label: "Shipment",
         },
       ],
+    };
+
+    const documentationItem = {
+      key: "/documentation",
+      icon: <ReadOutlined />,
+      label: "Documentation",
     };
 
     const pmItems: MenuItems = [
@@ -126,7 +133,12 @@ export default function Sidebar() {
         label: "My Build Requests",
       },
       sharedTrackerGroup,
+      documentationItem,
     ];
+
+    if (isProgramManager) {
+      pmItems.push(documentationItem);
+    }
 
     return [
       ...(isProgramManager ? pmItems : []),

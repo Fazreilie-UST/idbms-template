@@ -72,6 +72,24 @@ class Settings(BaseSettings):
         os.getenv("PROFILE_PICTURE_MAX_BYTES", str(2 * 1024 * 1024))  # 2 MB
     )
 
+    # 📚 Documentation (user-facing guides + developer references). Markdown
+    # files and image assets are stored in the project repo under this path
+    # so updates are tracked via version control.
+    DOCS_DIR: str = os.getenv(
+        "DOCS_DIR",
+        "/home/fbinalex/NPI-IDBMS/docs",
+    )
+    # The assets sub-folder is mounted as a public static directory and
+    # referenced from markdown via the URL prefix below.
+    DOCS_ASSETS_SUBDIR: str = "assets"
+    DOCS_ASSETS_URL_PREFIX: str = "/static/docs-assets"
+    DOCS_ASSET_MAX_BYTES: int = int(
+        os.getenv("DOCS_ASSET_MAX_BYTES", str(10 * 1024 * 1024))  # 10 MB
+    )
+    # Role required to edit documentation (create/update markdown pages and
+    # manage assets). Defaults to "Admin"; override via env if needed.
+    DOCS_EDIT_ROLE: str = os.getenv("DOCS_EDIT_ROLE", "Admin")
+
     class Config:
         env_file = ".env"
         case_sensitive = True

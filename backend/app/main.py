@@ -102,6 +102,20 @@ app.mount(
     name="profile-pictures",
 )
 
+# Serve documentation assets (screenshots/images embedded in markdown docs).
+# Stored in the project repo under `docs/assets/` so updates can be committed
+# to version control.
+_docs_assets_dir = (
+    Path(settings.DOCS_DIR).expanduser() / settings.DOCS_ASSETS_SUBDIR
+)
+_docs_assets_dir.mkdir(parents=True, exist_ok=True)
+(_docs_assets_dir / "screenshots").mkdir(parents=True, exist_ok=True)
+app.mount(
+    settings.DOCS_ASSETS_URL_PREFIX,
+    StaticFiles(directory=str(_docs_assets_dir)),
+    name="docs-assets",
+)
+
 
 @app.get("/")
 def root():

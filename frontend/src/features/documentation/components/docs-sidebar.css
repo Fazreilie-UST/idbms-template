@@ -1,0 +1,108 @@
+/* Documentation sidebar — refined typography, left-aligned, compact. */
+.docs-sidebar {
+  padding: 8px 0 16px;
+  font-size: 12.5px;
+  color: #1f2937; /* darker than AntD default for stronger contrast */
+}
+
+.docs-sidebar .docs-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.docs-sidebar .docs-nav-item {
+  margin: 0;
+}
+
+.docs-sidebar .docs-nav-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 12px 5px 8px;
+  background: none;
+  border: 0;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  letter-spacing: 0.01em;
+  transition: background-color 0.12s ease, color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.docs-sidebar .docs-nav-button:hover {
+  background: #f3f4f6;
+  color: #0f172a;
+}
+
+.docs-sidebar .docs-nav-button:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: -2px;
+}
+
+/* Top-level group titles: slightly bolder, uppercase-ish tracking. */
+.docs-sidebar .docs-nav-button.depth-0.is-group {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #475569;
+  padding-top: 10px;
+  padding-bottom: 6px;
+}
+.docs-sidebar .docs-nav-button.depth-0.is-group:hover {
+  background: transparent;
+  color: #0f172a;
+}
+
+/* Nested group titles (e.g. "DB ERD") — regular weight, normal case. */
+.docs-sidebar .docs-nav-button.is-group:not(.depth-0) {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Leaf pages */
+.docs-sidebar .docs-nav-button.is-leaf {
+  color: #334155;
+  font-weight: 400;
+}
+
+.docs-sidebar .docs-nav-button.is-selected {
+  background: #eff6ff;
+  border-left-color: #1677ff;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+
+.docs-sidebar .docs-nav-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  flex: 0 0 12px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.docs-sidebar .docs-nav-button.is-selected .docs-nav-caret {
+  color: #1d4ed8;
+}
+
+.docs-sidebar .docs-nav-bullet {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.docs-sidebar .docs-nav-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

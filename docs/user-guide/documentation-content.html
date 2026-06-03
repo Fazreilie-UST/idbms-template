@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Summary</title>
+</head>
+<body>
+  <h1>User Summary</h1>
+  <p>NPI DBMS is a centralized web-based platform for managing Intel New Product Introduction (NPI) data and workflows. It enables different user roles — including Program Managers, Requestors/Viewers, and ODM partners — to securely create, view, update, and manage build plan information through a unified interface.</p>
+  <p>The system provides dashboards and analytics for reporting, tracking, and monitoring NPI activities, helping teams make data-driven decisions efficiently. It supports database integration across multiple Business Units (BUs), improving data consistency, collaboration, and process visibility throughout the organization.</p>
+  <hr>
+  <h1>Admin Page Overview</h1>
+  <h2>Dashboard</h2>
+  <p>Displays analytics summaries of build plan information from the database. There are two primary dashboard views:</p>
+  <ul>
+    <li><strong>My Build Plans</strong>: Standardized dashboard with visuals for build plans managed by the current PM.</li>
+    <li><strong>Overview</strong>: Dashboard with analytics charts for all build plans in the database.</li>
+  </ul>
+  <h3>My Build Plans</h3>
+  <ul>
+    <li><strong>Filterable by family code</strong> (default: all)</li>
+    <li><strong>Charts/Graphs/Cards</strong>:
+      <ul>
+        <li>Build Plans: Total number of build configs handled/created by the current PM</li>
+        <li>New/Hold/Plan/Completed: Status breakdowns</li>
+        <li>Build Requests: Total managed by current PM</li>
+        <li>Shipments: Total related to current PM's build plans</li>
+        <li>My Recent Build Plans: 5 most recent</li>
+        <li>Recent Build Requests: 5 most recent activities</li>
+        <li>Recent Shipments: 5 most recent updates</li>
+      </ul>
+    </li>
+  </ul>
+  <h3>Overview</h3>
+  <ul>
+    <li><strong>Filterable by Year, Family, Form Factor, Status</strong> (default: all)</li>
+    <li><strong>Charts/Graphs/Cards</strong>:
+      <ul>
+        <li>Total Builds, Total Boards, Families, Form Factors</li>
+        <li>Milestone Builds</li>
+        <li>Family × Form Factor breakdown (pie chart)</li>
+        <li>Family × Attribute breakdown (Silicon Stepping, PCB Revision, HW Revision)</li>
+        <li>Number of Builds/Boards by Support Activity and Form Factor (stacked bar)</li>
+        <li>Milestone Builds Timeline (monthly)</li>
+        <li>Component charts (by Supplier, by PCB Supplier, details by attributes)</li>
+      </ul>
+    </li>
+  </ul>
+  <hr>
+  <h2>My Build Plans</h2>
+  <p>Displays a list of build plans managed by the current PM. Features:</p>
+  <ul>
+    <li>Tabs for status: Managed by me, New, Hold, Plan, Completed</li>
+    <li>Sortable columns, filterable by family/form factor/status, searchable, column visibility</li>
+  </ul>
+  <h2>Manage Build Request</h2>
+  <p>Displays build requests managed by the current PM. Features:</p>
+  <ul>
+    <li>Tabs for status: Managed by me, Draft, Submitted, Under Review, Approved, Planned, Locked, Completed, Rejected, Cancelled</li>
+    <li>Sortable columns, filterable by family/form factor, searchable, column visibility</li>
+  </ul>
+  <h2>Tracker</h2>
+  <p>Read-only views for searching plans, requests, and shipments.</p>
+  <h2>Administration</h2>
+  <ul>
+    <li><strong>Import Build Plan</strong>: Import build plan Excel files (step-by-step guidance)</li>
+    <li><strong>Import Shipments</strong>: Import shipment Excel files (step-by-step guidance)</li>
+    <li><strong>User Management</strong>: Edit, assign roles, merge users</li>
+  </ul>
+</body>
+</html>

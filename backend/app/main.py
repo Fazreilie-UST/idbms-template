@@ -26,29 +26,35 @@ from app.db.session import SessionLocal
 from app.db.audit_listeners import register_audit_listeners
 from app.core.logging import setup_logging
 from app.core.rate_limit import limiter
-from app.seed import seed_db
 
 # Attach SQLAlchemy session listeners that populate `audit_logs` for every
 # CRUD on the audited models. Idempotent; safe under uvicorn --reload.
 register_audit_listeners()
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    if settings.ENV == "dev":
-        db = SessionLocal()
-        try:
-            seed_db(db)
-        finally:
-            db.close()
-    yield
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     if settings.ENV == "dev":
+#         db = SessionLocal()
+#         try:
+#             seed_db(db)
+#         finally:
+#             db.close()
+#     yield
 
 setup_logging()
 
+
 app = FastAPI(
     title="NPI DBMS API",
-    lifespan=lifespan,
+    # lifespan=lifespan,
 )
+
+import os
+
+# Serve bug report attachments from db/bug-report-attachment
+bug_report_attachments_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../db/bug-report-attachment"))
+app.mount("/db/bug-report-attachment", StaticFiles(directory=bug_report_attachments_dir), name="bug-report-attachments")
 
 app.state.limiter = limiter
 app.add_exception_handler(HTTPException, http_exception_handler)

@@ -29,6 +29,7 @@ from app.models.auth.user import User
 router = APIRouter(prefix="/docs", tags=["Documentation"])
 
 
+<<<<<<< Updated upstream
 # ---------------------------------------------------------------------------
 # Documentation tree (default structure required by the product spec).
 # Each leaf has a ``path`` relative to ``settings.DOCS_DIR`` and a stable
@@ -99,6 +100,141 @@ DOC_TREE: list[dict[str, Any]] = [
         ],
     },
 ]
+=======
+
+# ---------------------------------------------------------------------------
+# Role-based Documentation Tree Generation
+# ---------------------------------------------------------------------------
+def get_doc_tree_for_roles(roles: set[str]) -> list[dict[str, Any]]:
+    import copy
+    # --- Admin/PM View ---
+    # Shared trackers paths for both Admin/PM and Requestor/Viewer
+    shared_trackers = [
+        {"key": "build-plan", "label": "Build Plan", "path": "getting-started/admin-pm/trackers/build-plan.html"},
+        {"key": "build-request", "label": "Build Request", "path": "getting-started/admin-pm/trackers/build-request.html"},
+        {"key": "shipment", "label": "Shipment", "path": "getting-started/admin-pm/trackers/shipment.html"},
+    ]
+    admin_pm_view = {
+        "key": "admin-pm-view",
+        "label": "Admin/PM View",
+        "children": [
+            {"key": "dashboard", "label": "Dashboard", "path": "getting-started/admin-pm/dashboard.html"},
+            {"key": "my-build-plan", "label": "My Build Plan", "path": "getting-started/admin-pm/my-build-plan.html"},
+            {"key": "manage-build-request", "label": "Manage Build Request", "path": "getting-started/admin-pm/manage-build-request.html"},
+            {
+                "key": "trackers",
+                "label": "Trackers",
+                "children": shared_trackers,
+            },
+            {
+                "key": "administration",
+                "label": "Administration",
+                "children": [
+                    {"key": "import-build-plan", "label": "Import Build Plan", "path": "getting-started/admin-pm/administration/import-build-plan.html"},
+                    {"key": "import-shipments", "label": "Import Shipments", "path": "getting-started/admin-pm/administration/import-shipments.html"},
+                    {"key": "user-management", "label": "User Management", "path": "getting-started/admin-pm/administration/user-management.html"},
+                    {"key": "role-management", "label": "Role Management", "path": "getting-started/admin-pm/administration/role-management.html"},
+                    {"key": "db-tables", "label": "DB Tables", "path": "getting-started/admin-pm/administration/db-tables.html"},
+                ],
+            },
+            {"key": "documentation", "label": "Documentation", "path": "getting-started/admin-pm/documentation.html"},
+            {
+                "key": "audit-logs",
+                "label": "Audit & Logs",
+                "children": [
+                    {"key": "audit-logs", "label": "Audit Logs", "path": "getting-started/admin-pm/audit-logs.html"},
+                    {"key": "bug-reports", "label": "Bug Reports", "path": "getting-started/admin-pm/bug-reports.html"},
+                ],
+            },
+            {"key": "report-issue", "label": "Report an Issue", "path": "getting-started/admin-pm/report-issue.html"},
+        ],
+    }
+    # --- Requestor/Viewer View ---
+    requestor_view = {
+        "key": "requestor-view",
+        "label": "Requestor/Viewer View",
+        "children": [
+            {"key": "dashboard", "label": "Dashboard", "path": "getting-started/requestor/dashboard.html"},
+            {"key": "my-build-request", "label": "My Build Request", "path": "getting-started/requestor/my-build-request.html"},
+            {
+                "key": "trackers",
+                "label": "Trackers",
+                "children": shared_trackers,
+            },
+            {"key": "documentation", "label": "Documentation", "path": "getting-started/admin-pm/documentation.html"},
+            {"key": "report-issue", "label": "Report an Issue", "path": "getting-started/admin-pm/report-issue.html"},
+        ],
+    }
+    # --- Base tree ---
+    base_tree = [
+        {
+            "key": "getting-started",
+            "label": "Getting Started",
+            "children": [
+                {"key": "introduction", "label": "Introduction", "path": "getting-started/introduction.html"},
+                {
+                    "key": "page-navigation",
+                    "label": "Page Navigation",
+                    # children will be filled below
+                },
+            ],
+        },
+        {
+            "key": "user-guide",
+            "label": "User Guide",
+            "children": [
+                {"key": "admin", "label": "Admin", "path": "user-guide/admin.html"},
+                {"key": "program-manager", "label": "Program Manager", "path": "user-guide/program-manager.html"},
+                {"key": "requestor", "label": "Requestor", "path": "user-guide/requestor.html"},
+                {
+                    "key": "developer",
+                    "label": "Developer",
+                    "children": [
+                        {"key": "api-docs", "label": "API Docs", "path": "developer/api-documentation.html", "embed": "swagger"},
+                        {
+                            "key": "db-erd",
+                            "label": "DB ERD",
+                            "children": [
+                                {"key": "current-db", "label": "Current DB", "path": "developer/db-erd/current-db.html"},
+                                {"key": "external-db", "label": "External DB", "path": "developer/db-erd/external-db.html"},
+                            ],
+                        },
+                        {"key": "system-architecture", "label": "System Architecture", "path": "developer/architecture-summary.html"},
+                    ],
+                },
+            ],
+        },
+        {"key": "glossary", "label": "Glossary", "path": "user-guide/glossary.html"},
+    ]
+    # Determine role
+    roles_lower = {r.lower() for r in roles}
+    is_admin = "admin" in roles_lower
+    is_pm = "pm" in roles_lower or "program manager" in roles_lower
+    is_requestor = "requestor" in roles_lower or "viewer" in roles_lower
+    # Build the navigation children based on role
+    nav_children = []
+    if is_admin:
+        nav_children = [admin_pm_view, requestor_view]
+    elif is_pm:
+        nav_children = admin_pm_view["children"]
+    elif is_requestor:
+        nav_children = requestor_view["children"]
+    else:
+        nav_children = [admin_pm_view, requestor_view]
+    # Insert the navigation children into the tree
+    tree = copy.deepcopy(base_tree)
+    for node in tree:
+        if node["key"] == "getting-started":
+            for child in node["children"]:
+                if child["key"] == "page-navigation":
+                    child["children"] = nav_children
+    return tree
+
+def get_allowed_pages_for_roles(roles: set[str]) -> dict[str, dict[str, Any]]:
+    return _collect_allowed_paths(get_doc_tree_for_roles(roles))
+
+
+>>>>>>> Stashed changes
 
 
 def _collect_allowed_paths(tree: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -111,7 +247,11 @@ def _collect_allowed_paths(tree: list[dict[str, Any]]) -> dict[str, dict[str, An
     return out
 
 
+<<<<<<< Updated upstream
 _ALLOWED_PAGES: dict[str, dict[str, Any]] = _collect_allowed_paths(DOC_TREE)
+=======
+
+>>>>>>> Stashed changes
 
 
 # ---------------------------------------------------------------------------
@@ -133,6 +273,7 @@ def _assets_root() -> Path:
     return root
 
 
+<<<<<<< Updated upstream
 def _resolve_page_path(rel_path: str) -> Path:
     """Resolve and validate ``rel_path`` against the whitelist.
 
@@ -146,11 +287,27 @@ def _resolve_page_path(rel_path: str) -> Path:
     # Extra belt-and-suspenders: every segment must look like a slug. The
     # whitelist already guarantees this, but a future edit to ``DOC_TREE``
     # shouldn't be able to silently introduce ``..`` or absolute paths.
+=======
+def _resolve_page_path(rel_path: str, allowed_pages: dict[str, dict[str, Any]]) -> Path:
+    """Resolve and validate ``rel_path`` against the whitelist for the current role."""
+    if rel_path not in allowed_pages:
+        raise HTTPException(status_code=404, detail="Unknown documentation page")
+
+>>>>>>> Stashed changes
     parts = rel_path.split("/")
     for segment in parts[:-1]:
         if not _SAFE_SEGMENT_RE.match(segment):
             raise HTTPException(status_code=400, detail="Invalid path segment")
+<<<<<<< Updated upstream
     if not parts[-1].endswith(".md") or not _SAFE_SEGMENT_RE.match(parts[-1][:-3]):
+=======
+    # Accept .md or .html files
+    if not (parts[-1].endswith(".md") or parts[-1].endswith(".html")):
+        raise HTTPException(status_code=400, detail="Invalid page filename")
+    # Validate filename slug (strip .md or .html)
+    base = parts[-1][:-3] if parts[-1].endswith(".md") else parts[-1][:-5]
+    if not _SAFE_SEGMENT_RE.match(base):
+>>>>>>> Stashed changes
         raise HTTPException(status_code=400, detail="Invalid page filename")
 
     root = _docs_root()
@@ -186,6 +343,10 @@ class DocPageContent(BaseModel):
     updated_at: datetime | None = None
     embed: str | None = None
     can_edit: bool = False
+<<<<<<< Updated upstream
+=======
+    format: str = "markdown"  # "markdown" or "html"
+>>>>>>> Stashed changes
 
 
 class DocPageUpdate(BaseModel):
@@ -218,7 +379,11 @@ class DocTreeResponse(BaseModel):
 def get_doc_tree(current_user: User = Depends(get_current_user)) -> DocTreeResponse:
     roles = getattr(current_user, "token_roles", set()) or set()
     return DocTreeResponse(
+<<<<<<< Updated upstream
         tree=DOC_TREE,
+=======
+        tree=get_doc_tree_for_roles(roles),
+>>>>>>> Stashed changes
         can_edit=settings.DOCS_EDIT_ROLE in roles,
         assets_url_prefix=settings.DOCS_ASSETS_URL_PREFIX,
     )
@@ -230,11 +395,21 @@ def get_doc_page(
     current_user: User = Depends(get_current_user),
 ) -> DocPageContent:
     """Return the markdown content for ``path`` (relative to docs root)."""
+<<<<<<< Updated upstream
     node = _ALLOWED_PAGES.get(path)
     if node is None:
         raise HTTPException(status_code=404, detail="Unknown documentation page")
 
     target = _resolve_page_path(path)
+=======
+    roles = getattr(current_user, "token_roles", set()) or set()
+    allowed_pages = get_allowed_pages_for_roles(roles)
+    node = allowed_pages.get(path)
+    if node is None:
+        raise HTTPException(status_code=404, detail="Unknown documentation page")
+
+    target = _resolve_page_path(path, allowed_pages=allowed_pages)
+>>>>>>> Stashed changes
     content = ""
     updated_at: datetime | None = None
     if target.exists():
@@ -244,7 +419,11 @@ def get_doc_page(
         except OSError as exc:
             raise HTTPException(status_code=500, detail=f"Could not read page: {exc}")
 
+<<<<<<< Updated upstream
     roles = getattr(current_user, "token_roles", set()) or set()
+=======
+    fmt = "html" if path.endswith(".html") else "markdown"
+>>>>>>> Stashed changes
     return DocPageContent(
         path=path,
         label=node.get("label", path),
@@ -252,6 +431,10 @@ def get_doc_page(
         updated_at=updated_at,
         embed=node.get("embed"),
         can_edit=settings.DOCS_EDIT_ROLE in roles,
+<<<<<<< Updated upstream
+=======
+        format=fmt,
+>>>>>>> Stashed changes
     )
 
 
@@ -262,11 +445,21 @@ def update_doc_page(
     current_user: User = Depends(_require_docs_editor),
 ) -> DocPageContent:
     """Replace the markdown content for ``path``. Admin-only."""
+<<<<<<< Updated upstream
     node = _ALLOWED_PAGES.get(path)
     if node is None:
         raise HTTPException(status_code=404, detail="Unknown documentation page")
 
     target = _resolve_page_path(path)
+=======
+    roles = getattr(current_user, "token_roles", set()) or set()
+    allowed_pages = get_allowed_pages_for_roles(roles)
+    node = allowed_pages.get(path)
+    if node is None:
+        raise HTTPException(status_code=404, detail="Unknown documentation page")
+
+    target = _resolve_page_path(path, allowed_pages=allowed_pages)
+>>>>>>> Stashed changes
     target.parent.mkdir(parents=True, exist_ok=True)
     try:
         # Atomic-ish write: write to a temp file then rename so a crash mid-

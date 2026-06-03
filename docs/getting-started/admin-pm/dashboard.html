@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin/PM Dashboard Documentation</title>
+</head>
+<body>
+  <p>Display analytics summaries of build plan information based on the data stored in the database.</p>
+  <p>The dashboard contains 2 primary views:</p>
+  <ul>
+    <li><a href="http://localhost:5173/pm/dashboard#mine">My Build Plans</a></li>
+    <li><a href="http://localhost:5173/pm/dashboard#business">Overview</a></li>
+  </ul>
+
+  <h3 style="color: black;">My Build Plans</h3>
+  <p>A standardized dashboard populated using build plans managed by the <b>current</b> Program Manager (PM).</p>
+  <h4 >Features</h4>
+  <ul>
+    <li>Filterable by <b>Family Code</b> (<i>Default filter: Displays all data <b>including</b> "cancelled" build config</i>)</li>
+  </ul>
+  <img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-152436-d6d146bb4f76.png" alt="Filter 1" style="max-width:100%; margin-bottom: 1em;" />
+  <h4>Dashboard Visuals</h4>
+  <br>
+  <h5>Build Plans</h5>
+  <img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-152359-b43b491a819a.png" alt="Total Build Plan Config handled by PM Cards" style="max-width:100%;" />
+  <table border="1" cellpadding="6" style="border-collapse:collapse; margin: 12px 0;">
+    <thead><tr><th>Charts / Graphs / Cards</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>My Build Plans</td><td>Display total number of build configs handled/created by the current PM</td></tr>
+      <tr><td>New</td><td>Display total number of build configs with <b>"new"</b> status handled/created by the current PM</td></tr>
+      <tr><td>Hold</td><td>Display total number of build configs with <b>"hold"</b> status handled/created by the current PM</td></tr>
+      <tr><td>Plan</td><td>Display total number of build configs with <b>"plan"</b> status handled/created by the current PM</td></tr>
+      <tr><td>Completed</td><td>Display total number of build configs with <b>"completed"</b> status handled/created by the current PM</td></tr>
+    </tbody>
+  </table>
+
+  <h5>Orders &amp; Shipments</h5>
+  <img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-152407-02a758ab58c1.png" alt="Total Orders and Shipments handled by PM" style="max-width:100%;" />
+  <table border="1" cellpadding="6" style="border-collapse:collapse; margin: 12px 0;">
+    <thead><tr><th>Charts / Graphs / Cards</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>Build Requests</td><td>Display total number of build requests handled/managed by the current PM</td></tr>
+      <tr><td>Shipments</td><td>Display total number of shipments related to build plans handled/managed by the current PM</td></tr>
+    </tbody>
+  </table>
+
+  <h5>Other section</h5>
+  <table border="1" cellpadding="6" style="border-collapse:collapse; margin: 12px 0;">
+    <thead><tr><th>Tables</th><th>Details</th><th>Screenshot/Sample</th></tr></thead>
+    <tbody>
+      <tr><td>My Recent Build Plans</td><td>Display the 5 most recent build plans created by the current PM</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-152502-cf285152cc44.png" alt="Top 5 Recent Build Plans Table" style="max-width:100%;" /></td></tr>
+      <tr><td>Recent Build Requests</td><td>Display the 5 most recent build request activities (creation, update, cancellation) managed by the current PM</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-152508-c1fe6e6821e3.png" alt="Top 5 Recent Build Request Table" style="max-width:100%;" /></td></tr>
+      <tr><td>Recent Shipments</td><td>Display the 5 most recent shipment updates related to build plans handled by the current PM</td><td></td></tr>
+    </tbody>
+  </table>
+
+  <hr />
+
+  <h3>Overview</h3>
+  <p>A standardized dashboard populated using all build plan data available in the database.</p>
+  <h4>Features</h4>
+  <ul>
+    <li>Filterable by Year, Family, Form Factor, Status Code (<i>Default filter: Displays all data excluding build configs with <b>"cancelled"</b> status</i>)</li>
+  </ul>
+  <img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-135610-3d9406ad0645.png" alt="Filters 2" style="max-width:100%;" />
+  <ul>
+    <li>Generic toggle quantity display between: <b>Builds (Configs)</b> and <b>Boards (Build Requests + Quantity stored in warehouse)</b></li>
+  </ul>
+  <img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-135504-7fd5773be6b0.png" alt="Toggle" style="max-width:100%;" />
+
+  <h4>Dashboard Visuals</h4>
+  <table border="1" cellpadding="6" style="border-collapse:collapse; margin: 12px 0;">
+    <thead><tr><th>Charts / Graphs / Cards</th><th>Details</th><th>Screenshot / Sample</th></tr></thead>
+    <tbody>
+      <tr><td>Total Builds</td><td>Display total number of build configs recorded in the database</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-132238-e8017b8dc8f9.png" alt="Total Builds Card" style="max-width:100%;" /></td></tr>
+      <tr><td>Total Boards</td><td>Display total build quantity (sum of build requests + warehouse stored quantity) recorded in the database</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-135318-a7d16ea6aafe.png" alt="Total Boards Card" style="max-width:100%;" /></td></tr>
+      <tr><td>Families</td><td>Display total number of families/products recorded in the database</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-135318-a7d16ea6aafe.png" alt="Families Card" style="max-width:100%;" /></td></tr>
+      <tr><td>Form Factors</td><td>Display total number of form factors recorded in the database</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-135434-7a2eeb553c75.png" alt="Form Factors Card" style="max-width:100%;" /></td></tr>
+      <tr><td>Milestone Builds</td><td>Display total number of build plans with <b>"Milestone"</b> as the Support Activity label</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-135441-deddf854353e.png" alt="Milestones Builds Card" style="max-width:100%;" /></td></tr>
+      <tr><td>Family × Form Factor Breakdown</td><td>Display a pie chart per selected family sliced based on form factor</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-135456-bd5d6a1c9ab2.png" alt="Family × Form Factor Breakdown Section" style="max-width:100%;" /></td></tr>
+      <tr><td>Family × Attribute Breakdown</td><td>Display charts grouped by selected family attributes</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-141843-f8165d1dd5b5.png" alt="Family X Attribute Breakdown Charts" style="max-width:100%;" /></td></tr>
+      <tr><td>Number of Builds/Boards by Support Activity and Form Factor</td><td>Display stacked bar chart showing number of builds/boards grouped by support activity and form factor</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-141857-623ec6243f92.png" alt="Number of Builds/Boards by Support Activity and Form Factor Stacked Bar Chart" style="max-width:100%;" /></td></tr>
+      <tr><td>Milestone Builds Timeline (Monthly)</td><td>Display bar chart showing number of milestone build plans (Support Activity = <b>Milestone</b>) by month</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-141925-43e6aec0a8ca.png" alt="Milestone Builds Timeline (Monthly) Bar Chart" style="max-width:100%;" /></td></tr>
+      <tr><td>Component</td><td>Display component-related analytics charts and tables</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-141946-fb3486d37703.png" alt="Component Charts and Tables" style="max-width:100%;" /></td></tr>
+    </tbody>
+  </table>
+
+  <h5>Family × Attribute Breakdown</h5>
+  <p>Display the following charts per selected family:</p>
+  <table border="1" cellpadding="6" style="border-collapse:collapse; margin: 12px 0;">
+    <thead><tr><th>Attribute</th><th>Visualization</th><th>Screenshot/Sample</th></tr></thead>
+    <tbody>
+      <tr><td>Silicon Stepping</td><td>Bar graph displaying number of builds by silicon stepping</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-150334-2723a5047b22.png" alt="Silicon Stepping Bar Chart" style="max-width:100%;" /></td></tr>
+      <tr><td>PCB Revision</td><td>Pie chart displaying number of builds by PCB revision</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-150408-17fbdc6d7bb3.png" alt="PCB Revision Pie Chart" style="max-width:100%;" /></td></tr>
+      <tr><td>HW Revision</td><td>Pie chart displaying number of builds by HW revision</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-150522-1b2d1c48dabc.png" alt="HW Revision Pie Chart" style="max-width:100%;" /></td></tr>
+    </tbody>
+  </table>
+
+  <h5>Component Analytics</h5>
+  <p>Display component-related charts and tables selectable by component type.</p>
+  <table border="1" cellpadding="6" style="border-collapse:collapse; margin: 12px 0;">
+    <thead><tr><th>Visualization</th><th>Details</th><th>Screenshot/Sample</th></tr></thead>
+    <tbody>
+      <tr><td>Builds by Supplier</td><td>Bar chart displaying number of builds grouped by component supplier</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-150612-e6a685a05c5e.png" alt="Component Supplier Build" style="max-width:100%;" /></td></tr>
+      <tr><td>Boards by Supplier</td><td>Bar chart displaying number of boards grouped by component supplier</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-150625-e2b8f6e64f3e.png" alt="Component Supplier Boards" style="max-width:100%;" /></td></tr>
+      <tr><td>Details by Attributes</td><td>Table displaying total boards, required quantity, and total builds grouped by component supplier attributes</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-150637-3cebdfa6158a.png" alt="Details by Attr Table" style="max-width:100%;" /></td></tr>
+      <tr><td>Count of &lt;Component&gt; (Builds) by PCB Supplier</td><td>Bar chart displaying build count grouped by PCB supplier</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-150625-e2b8f6e64f3e.png" alt="Count of component builds by PCB Supplier" style="max-width:100%;" /></td></tr>
+      <tr><td>Count of &lt;Component&gt; (Boards) by PCB Supplier</td><td>Bar chart displaying board count grouped by PCB supplier</td><td><img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-25-150653-ac2ec3658569.png" alt="Count of component boards by PCB Supplier" style="max-width:100%;" /></td></tr>
+    </tbody>
+  </table>
+</body>
+</html>

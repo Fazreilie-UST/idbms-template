@@ -335,6 +335,7 @@ def upload_build_plan_file(
     except Exception:  # noqa: BLE001
         plan_count = None
 
+
     record = BuildPlanImportFile(
         original_filename=file.filename,
         stored_filename=stored_name,
@@ -352,9 +353,63 @@ def upload_build_plan_file(
     db.commit()
     db.refresh(record)
 
+    # Audit log for file import
+    try:
+        from app.services.audit_service import AuditService
+        from app.models.audit.audit_log import AuditModule, AuditAction
+        audit_entry = AuditService.record(
+            db,
+            module=AuditModule.build_plan,
+            action=AuditAction.create,
+            record_id=record.id,
+            user_id=current_user.id,
+            old_value=None,
+            new_value={
+                "original_filename": record.original_filename,
+                "stored_filename": record.stored_filename,
+                "file_size": record.file_size,
+                "work_week": record.work_week,
+                "work_year": record.work_year,
+                "file_revision": record.file_revision,
+                "plan_count": plan_count,
+            },
+        )
+        db.commit()
+        print(f"[AUDIT DEBUG] Build plan upload audit entry: {audit_entry}")
+    except Exception as e:
+        print(f"[AUDIT DEBUG] Exception during build plan upload audit: {e}")
+
+
+
     if auto_process:
         process_import_file(db, record)
         db.refresh(record)
+        print("[AUDIT DEBUG] Entering build plan process audit block")
+        # Summarized audit log for processed build plans
+        try:
+            from app.services.audit_service import AuditService
+            from app.models.audit.audit_log import AuditModule, AuditAction
+            from app.models.build.build_plan import BuildPlan
+            affected_plans = db.query(BuildPlan).filter(BuildPlan.import_file_id == record.id).all()
+            plan_ids = [plan.id for plan in affected_plans]
+            audit_entry = AuditService.record(
+                db,
+                module=AuditModule.build_plan,
+                action=AuditAction.create,
+                record_id=record.id,
+                user_id=current_user.id,
+                old_value=None,
+                new_value={
+                    "import_file": record.original_filename,
+                    "plan_count": len(plan_ids),
+                    "affected_build_plan_ids": plan_ids,
+                    "summary": f"User {current_user.id} imported {len(plan_ids)} build plans from {record.original_filename}"
+                },
+            )
+            db.commit()
+            print(f"[AUDIT DEBUG] Build plan process audit entry: {audit_entry}")
+        except Exception as e:
+            print(f"[AUDIT DEBUG] Exception during build plan process audit: {e}")
 
     return BuildPlanImportUploadResponse(
         record=BuildPlanImportFileResponse.model_validate(record),
@@ -536,8 +591,30 @@ def process_build_plan_files(
             result.skipped.append(file_id)
             continue
 
+
         process_import_file(db, record)
         db.refresh(record)
+        # Summarized audit log for processed build plans
+        try:
+            from app.services.audit_service import AuditService
+            from app.models.audit.audit_log import AuditModule, AuditAction
+            from app.models.build.build_plan import BuildPlan
+            affected_plans = db.query(BuildPlan).filter(BuildPlan.import_file_id == record.id).all()
+            plan_ids = [plan.id for plan in affected_plans]
+            AuditService.record(
+                db,
+                module=AuditModule.build_plan,
+                action=AuditAction.process,
+                record_id=record.id,
+                old_value=None,
+                new_value={
+                    "import_file": record.original_filename,
+                    "affected_build_plan_ids": plan_ids,
+                    "summary": f"Processed {len(plan_ids)} build plans via process."
+                },
+            )
+        except Exception:
+            pass
         result.processed.append(BuildPlanImportFileResponse.model_validate(record))
 
     return result
@@ -678,9 +755,33 @@ def process_build_plan_file_stream(
             worker_error: dict[str, str] = {}
 
             def _worker() -> None:
+                print("[AUDIT DEBUG] _worker() thread started for build plan processing")
                 try:
                     process_import_file(session, record, progress_cb=emit)
+                    print("[AUDIT DEBUG] process_import_file completed in _worker()")
+                    # Summarized audit log for processed build plans (UI-triggered)
+                    from app.services.audit_service import AuditService
+                    from app.models.audit.audit_log import AuditModule, AuditAction
+                    from app.models.build.build_plan_import_file_touch import BuildPlanImportFileTouch
+                    plan_ids = [row.build_plan_id for row in session.query(BuildPlanImportFileTouch).filter(BuildPlanImportFileTouch.import_file_id == record.id).all()]
+                    audit_entry = AuditService.record(
+                        session,
+                        module=AuditModule.build_plan,
+                        action=AuditAction.create,
+                        record_id=record.id,
+                        user_id=record.uploaded_by_id,  # fallback to uploader
+                        old_value=None,
+                        new_value={
+                            "import_file": record.original_filename,
+                            "plan_count": len(plan_ids),
+                            "affected_build_plan_ids": plan_ids,
+                            "summary": f"User {record.uploaded_by_id} imported {len(plan_ids)} build plans from {record.original_filename} (UI-triggered)"
+                        },
+                    )
+                    session.commit()
+                    print(f"[AUDIT DEBUG] Build plan process audit entry (UI): {audit_entry}")
                 except Exception as exc:  # noqa: BLE001 - report through the stream
+                    print(f"[AUDIT DEBUG] Exception in _worker(): {exc}")
                     worker_error["message"] = f"{type(exc).__name__}: {exc}"
                 finally:
                     # Sentinel: tells the generator the worker has finished.
@@ -809,18 +910,75 @@ def delete_build_plan_file(
     current_user: User = Depends(require_permission("build_plan:import")),
     db: Session = Depends(get_db),
 ):
+
+    from app.models.build.build_plan_revision import BuildPlanRevision
+    from app.models.build.build_plan import BuildPlan
+    from app.models.build.build_plan_import_file_touch import BuildPlanImportFileTouch
+    from app.services.audit_service import AuditService
+    from app.models.audit.audit_log import AuditModule, AuditAction
+
     record = db.query(BuildPlanImportFile).filter(BuildPlanImportFile.id == file_id).first()
     if not record:
         raise HTTPException(status_code=404, detail="Import file not found")
 
-    storage_path = Path(record.storage_path)
-    db.delete(record)
-    db.commit()
+    # Find all revisions from this file
+    revisions = db.query(BuildPlanRevision).filter(BuildPlanRevision.import_file_id == file_id).all()
+    affected_plan_ids = set(r.build_plan_id for r in revisions)
 
-    if delete_file and storage_path.exists():
-        try:
-            storage_path.unlink()
-        except OSError:
-            pass
 
-    return None
+    # Summarized audit log for deleted build plans
+    try:
+        plan_ids = list(affected_plan_ids)
+        AuditService.record(
+            db,
+            module=AuditModule.build_plan,
+            action=AuditAction.delete,
+            record_id=file_id,
+            old_value={
+                "deleted_build_plan_ids": plan_ids,
+                "reason": "Deleted via import file deletion"
+            },
+            new_value=None,
+        )
+    except Exception:
+        pass
+
+    for plan_id in affected_plan_ids:
+        plan = db.query(BuildPlan).filter(BuildPlan.id == plan_id).first()
+        if not plan:
+            continue
+        plan_revs = db.query(BuildPlanRevision).filter(BuildPlanRevision.build_plan_id == plan_id).order_by(BuildPlanRevision.revision_number).all()
+        revs_to_delete = [r for r in plan_revs if r.import_file_id == file_id]
+        if len(revs_to_delete) == len(plan_revs):
+            db.delete(plan)
+        else:
+            for rev in revs_to_delete:
+                db.add(record)
+                db.commit()
+                db.refresh(record)
+
+                # Audit log for file upload (storage)
+                try:
+                    from app.services.audit_service import AuditService
+                    from app.models.audit.audit_log import AuditModule, AuditAction
+                    AuditService.record(
+                        db,
+                        module=AuditModule.build_plan,
+                        action=AuditAction.create,
+                        record_id=record.id,
+                        user_id=current_user.id,
+                        old_value=None,
+                        new_value={
+                            "original_filename": record.original_filename,
+                            "stored_filename": record.stored_filename,
+                            "file_size": record.file_size,
+                            "work_week": record.work_week,
+                            "work_year": record.work_year,
+                            "file_revision": record.file_revision,
+                            "plan_count": plan_count,
+                            "summary": f"User {current_user.id} uploaded build plan file {record.original_filename} ({record.file_size} bytes)"
+                        },
+                    )
+                    db.commit()
+                except Exception:
+                    pass

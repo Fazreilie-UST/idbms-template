@@ -8,7 +8,7 @@ const { Content } = Layout;
 export default function MainLayout() {
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sidebar />
+      <Sidebar isProgramManager={true} isRequestor={false} role="admin" />
 
       <Layout>
         <AppHeader />

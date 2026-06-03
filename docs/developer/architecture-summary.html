@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>System Structure & Architecture</title>
+</head>
+<body>
+  <h2 style="color: black;">Overview</h2>
+  <pre>
+┌──────────────┐     HTTPS      ┌───────────────┐     SQL     ┌───────────────┐
+│  Frontend    │ ─────────────▶ │   Backend     │ ─────────▶ │  PostgreSQL   │
+│ (React+TS)   │                │  (FastAPI)    │            │               │
+└──────────────┘                └───────────────┘            └───────────────┘
+                                 │
+                                 ├──▶ Redis (rate-limit storage)
+                                 └──▶ Local filesystem (uploads, docs)
+  </pre>
+  <h2 style="color: black;">Repositories &amp; key folders</h2>
+  <ul>
+    <li><code>frontend/</code> – Vite + React 19 + TypeScript + Ant Design + Zustand.</li>
+    <li><code>backend/</code> – FastAPI + SQLAlchemy + Alembic + Pydantic v2.</li>
+    <li><code>docs/</code> – User and developer documentation (this folder).</li>
+    <li><code>db/</code> – On-disk storage for uploaded data files (build plans, shipments, profile pictures).</li>
+  </ul>
+  <h2 style="color: black;">Security</h2>
+  <ul>
+    <li>JWT access tokens delivered via httpOnly cookies, refreshed via <code>/api/v1/auth/refresh</code>.</li>
+    <li>Double-submit CSRF (<code>X-CSRF-Token</code> header) on all mutating requests.</li>
+    <li>Role-based access control via permission codes on every endpoint (<code>require_permission</code>, <code>require_any_permission</code>).</li>
+    <li>Security headers, request-body size cap and rate limiting are applied globally as middleware.</li>
+  </ul>
+  <h2 style="color: black;">Deployment</h2>
+  <p>The application is packaged with Docker Compose. See <code>docker-compose.yml</code> at the repository root for service definitions.</p>
+</body>
+</html>

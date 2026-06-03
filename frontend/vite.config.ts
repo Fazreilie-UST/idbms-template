@@ -38,4 +38,19 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    proxy: {
+      '/api/v1': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+    fs: {
+      allow: [
+        '.',
+        '../docs/assets', // Allow serving files from docs/assets
+      ],
+    },
+  },
 });

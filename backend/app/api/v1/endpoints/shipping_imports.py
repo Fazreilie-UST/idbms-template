@@ -202,6 +202,7 @@ def upload_shipping_file(
             duplicate=True,
         )
 
+
     record = ShippingImportFile(
         original_filename=file.filename,
         stored_filename=stored_name,
@@ -215,9 +216,54 @@ def upload_shipping_file(
     db.commit()
     db.refresh(record)
 
+    # Audit log for file upload (storage)
+    try:
+        from app.services.audit_service import AuditService
+        from app.models.audit.audit_log import AuditModule, AuditAction
+        AuditService.record(
+            db,
+            module=AuditModule.shipping,
+            action=AuditAction.create,
+            record_id=record.id,
+            user_id=current_user.id,
+            old_value=None,
+            new_value={
+                "original_filename": record.original_filename,
+                "stored_filename": record.stored_filename,
+                "file_size": record.file_size,
+                "summary": f"User {current_user.id} uploaded shipment file {record.original_filename} ({record.file_size} bytes)"
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
+
     if auto_process:
         process_import_file(db, record)
         db.refresh(record)
+        # Summarized audit log for processed shipments
+        try:
+            from app.services.audit_service import AuditService
+            from app.models.audit.audit_log import AuditModule, AuditAction
+            from app.models.order.shipping import Shipping
+            shipment_count = db.query(Shipping).filter(Shipping.import_file_id == record.id).count()
+            AuditService.record(
+                db,
+                module=AuditModule.shipping,
+                action=AuditAction.create,
+                record_id=record.id,
+                user_id=current_user.id,
+                old_value=None,
+                new_value={
+                    "import_file": record.original_filename,
+                    "shipment_count": shipment_count,
+                    "summary": f"User {current_user.id} imported {shipment_count} shipments from {record.original_filename}"
+                },
+            )
+            db.commit()
+        except Exception:
+            pass
 
     return ShippingImportUploadResponse(
         record=ShippingImportFileResponse.model_validate(record),
@@ -423,6 +469,30 @@ def process_shipping_file_stream(
             def _worker() -> None:
                 try:
                     process_import_file(session, record, progress_cb=emit)
+                    # Summarized audit log for processed shipments
+                    try:
+                        from app.services.audit_service import AuditService
+                        from app.models.audit.audit_log import AuditModule, AuditAction
+                        summary = record.summary or {}
+                        shipment_count = summary.get("inserted", 0)
+                        audit_entry = AuditService.record(
+                            session,
+                            module=AuditModule.shipping,
+                            action=AuditAction.create,
+                            record_id=record.id,
+                            user_id=current_user.id,
+                            old_value=None,
+                            new_value={
+                                "import_file": record.original_filename,
+                                "shipment_count": shipment_count,
+                                "summary": f"User {current_user.id} imported {shipment_count} shipments from {record.original_filename}",
+                                "details": summary,
+                            },
+                        )
+                        session.commit()
+                        print(f"[AUDIT DEBUG] Shipment process audit entry: {audit_entry}")
+                    except Exception as e:
+                        print(f"[AUDIT DEBUG] Exception during shipment process audit: {e}")
                 except Exception as exc:  # noqa: BLE001
                     worker_error["message"] = f"{type(exc).__name__}: {exc}"
                 finally:
@@ -501,6 +571,11 @@ def delete_shipping_file(
     current_user: User = Depends(require_permission("shipping:import")),
     db: Session = Depends(get_db),
 ):
+
+    from app.models.order.shipping import Shipping
+    from app.services.audit_service import AuditService
+    from app.models.audit.audit_log import AuditModule, AuditAction
+
     record = (
         db.query(ShippingImportFile)
         .filter(ShippingImportFile.id == file_id)
@@ -508,6 +583,28 @@ def delete_shipping_file(
     )
     if not record:
         raise HTTPException(status_code=404, detail="Import file not found")
+
+    # Attempt to delete shippings created by this import file
+    # If Shipping has a foreign key to ShippingImportFile, use it; otherwise, try to infer from summary
+    # Here, we assume summary["inserted"] contains IDs or info about inserted shippings
+    summary = record.summary or {}
+    inserted_ids = summary.get("inserted")
+    if inserted_ids and isinstance(inserted_ids, list):
+        shippings = db.query(Shipping).filter(Shipping.id.in_(inserted_ids)).all()
+        for ship in shippings:
+            AuditService.record(
+                db,
+                module=AuditModule.shipping,
+                action=AuditAction.delete,
+                record_id=ship.id,
+                old_value={
+                    "config_number_id": ship.config_number_id,
+                    "recipient_user_id": ship.recipient_user_id,
+                    "tracking_number": ship.tracking_number,
+                    "reason": "Shipping deleted via import file deletion"
+                },
+            )
+        db.query(Shipping).filter(Shipping.id.in_(inserted_ids)).delete(synchronize_session=False)
 
     storage_path = Path(record.storage_path)
     db.delete(record)

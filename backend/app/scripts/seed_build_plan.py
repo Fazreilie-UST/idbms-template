@@ -10,6 +10,10 @@ from openpyxl import load_workbook
 from openpyxl.utils.cell import range_boundaries
 from sqlalchemy.orm import Session
 
+# For explicit audit logging
+from app.services.audit_service import AuditService
+from app.models.audit.audit_log import AuditModule, AuditAction
+
 from app.db.session import SessionLocal
 from app.models.auth.user import User
 
@@ -2368,6 +2372,22 @@ def import_excel(file_path):
 
 
 if __name__ == "__main__":
-    import_excel(
-        "/home/fbinalex/NPI-IDBMS/backend/data/build plan/LzP Build Plan WW1626 rev1.xlsx"
-    )
+    file_path = "/home/fbinalex/NPI-IDBMS/backend/data/build plan/LzP Build Plan WW1626 rev1.xlsx"
+    import_excel(file_path)
+
+    # --- Explicit Audit Log Entry ---
+    # This assumes the import was successful and at least one build plan was imported.
+    # If you want to log each build plan, move this logic inside the import loop.
+    from app.db.session import SessionLocal
+    with SessionLocal() as session:
+        # Find all imported build plans from this file (example: by year/week/revision or other logic)
+        # Here, we just log a generic entry for the import event.
+        AuditService.record(
+            session,
+            module=AuditModule.build_plan,
+            action=AuditAction.create,
+            record_id=0,  # 0 or -1 for bulk/system import; or use a real build_plan.id if available
+            user_id=1,    # Use 1 or a system user if unknown
+            new_value={"file": file_path, "event": "Bulk build plan import"},
+        )
+        session.commit()

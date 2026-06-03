@@ -60,6 +60,21 @@ _AUDITED_MODELS: dict[str, AuditModule] = {
     "BuildRequest": AuditModule.build_request,
     "Shipping": AuditModule.shipping,
     "Component": AuditModule.component,
+    # Added missing models for auditing
+    "ComponentSupplier": AuditModule.component,
+    "ComponentSupplierFamily": AuditModule.component,
+    "Family": AuditModule.component,
+    "Supplier": AuditModule.component,
+    "FamilyFormFactor": AuditModule.component,
+    "PMFamily": AuditModule.component,
+    "Stock": AuditModule.component,
+    # Refined mappings for additional models
+    "LogReport": AuditModule.log_report,
+    "Permission": AuditModule.user,
+    "Role": AuditModule.user,
+    "UserRole": AuditModule.user,
+    "Department": AuditModule.user,
+    "RefreshToken": AuditModule.user,
 }
 
 # Columns we never want to persist in old_value / new_value JSON blobs.

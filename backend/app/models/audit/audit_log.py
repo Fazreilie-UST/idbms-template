@@ -9,6 +9,7 @@ class AuditModule(str, enum.Enum):
     build_request = "BuildRequest"
     shipping = "Shipping"
     component = "Component"
+    log_report = "LogReport"
 
 
 class AuditAction(str, enum.Enum):

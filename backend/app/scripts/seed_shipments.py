@@ -50,6 +50,10 @@ from app.models.build.config_number import ConfigNumber
 from app.models.order.forwarder import Forwarder
 from app.models.order.shipping import Shipping, ShippingStatus
 
+# For explicit audit logging
+from app.services.audit_service import AuditService
+from app.models.audit.audit_log import AuditModule, AuditAction
+
 
 EXCEL_PATH = Path(
     "/home/fbinalex/NPI-IDBMS/backend/data/Master Board Tracker.xlsx"
@@ -490,3 +494,18 @@ def seed_shipments(file_path: Path = EXCEL_PATH) -> None:
 
 if __name__ == "__main__":
     seed_shipments()
+
+    # --- Explicit Audit Log Entry ---
+    # This assumes the import was successful and at least one shipment was imported.
+    # If you want to log each shipment, move this logic inside the import loop.
+    from app.db.session import SessionLocal
+    with SessionLocal() as session:
+        AuditService.record(
+            session,
+            module=AuditModule.shipping,
+            action=AuditAction.create,
+            record_id=0,  # 0 or -1 for bulk/system import; or use a real shipment.id if available
+            user_id=1,    # Use 1 or a system user if unknown
+            new_value={"file": str(EXCEL_PATH), "event": "Bulk shipment import"},
+        )
+        session.commit()

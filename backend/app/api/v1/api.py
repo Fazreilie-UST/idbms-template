@@ -6,7 +6,6 @@ from app.api.v1.endpoints import (
     roles,
     permissions,
     departments,
-    stock_general,
     health,
     build_plans,
     build_plan_imports,
@@ -18,6 +17,11 @@ from app.api.v1.endpoints import (
     component_suppliers,
     dashboard,
     documentation,
+<<<<<<< Updated upstream
+=======
+    log_reports,
+    audit_logs,
+>>>>>>> Stashed changes
 )
 
 api_router = APIRouter()
@@ -29,7 +33,6 @@ api_router.include_router(permissions.router, prefix="/permissions", tags=["Perm
 api_router.include_router(departments.router, prefix="/departments", tags=["Departments"])
 
 api_router.include_router(health.router)
-api_router.include_router(stock_general.router)
 
 api_router.include_router(build_plans.router)
 api_router.include_router(build_plan_imports.router)
@@ -57,3 +60,5 @@ api_router.include_router(
 )
 api_router.include_router(lookups.addresses_router, prefix="/addresses", tags=["Addresses"])
 api_router.include_router(lookups.warehouses_router, prefix="/warehouses", tags=["Warehouses"])
+api_router.include_router(log_reports.router, tags=["Log Reports"])
+api_router.include_router(audit_logs.router, tags=["Audit Logs"])

@@ -19,6 +19,10 @@
 import type { ReactNode } from "react";
 import { resolveBackendUrl } from "@/config";
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 // ---------------------------------------------------------------------------
 // Inline parsing
 // ---------------------------------------------------------------------------
@@ -385,6 +389,10 @@ function parseBlocks(source: string): Block[] {
 // Renderer
 // ---------------------------------------------------------------------------
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 function renderBlock(block: Block, idx: number): ReactNode {
   const key = `b-${idx}`;
   switch (block.type) {

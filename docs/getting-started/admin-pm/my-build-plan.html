@@ -1,0 +1,40 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin/PM Dashboard Documentation</title>
+</head>
+<body>
+  <p>Listing all build plans created/managed by <b>current PM</b></p>
+  <h2 style="color: black;">Table Guide</h2>
+  <img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-26-131321-59911c66021f.png" alt="" style="max-width:100%;" />
+  <table border="1" cellpadding="6" style="border-collapse:collapse; margin: 12px 0;">
+    <thead><tr><th>Marker ID</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Tab view to display list of build plans by status</td></tr>
+      <tr><td>2</td>
+        <td>Button list: <br>
+          Apply : apply the selected filters (3) and added search text(4) to the build plan list <br>
+          Reset : reset the applied searches, filters and sortations<br>
+          Refresh : refreshes the build plan list<br>
+          Columns : display a column visibility section to allow user to select what columns they need to see<br>
+          Grant Access : Add build plan access to selected PM<br> 
+        </td></tr>
+      <tr><td>3</td><td>Filter Dropdown to filters the returned build plan list based on selected Family, Form Factor and Status. <i>default will list all</i></td></tr>
+      <tr><td>4</td><td>Search Bar</td></tr>
+      <tr><td>5</td><td>Clickable link. Will redirect user to the Build Plan View page (<i>information inside the page will changes based on build plan's config number</i>)</td></tr>
+    </tbody>
+  </table>
+  <br>
+  - Clicking the table row will open up a nested table which will be displayed beneath the selected table row.
+  <img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-26-132153-ce4da1b91b54.png" alt="" style="max-width:100%;" />
+  <br>
+  <br>
+  <h2 style="color: black;">Build Plan View Page</h2>
+  <p>Opened when user clicked the build plan's config number </p>
+  <img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-26-132715-f28457c0e08e.png" alt="" style="max-width:100%;" /><!DOCTYPE html>
+  <br>
+  <p>Revision section will dislay/highlight build plan changes from time to time</p>
+  <img src="http://localhost:8000/docs/assets/screenshots/screenshot-2026-05-26-132755-25c9d89db0cb.png" alt="" style="max-width:100%;" />
+
+</body>
+</html>

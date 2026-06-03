@@ -82,7 +82,11 @@ class Settings(BaseSettings):
     # The assets sub-folder is mounted as a public static directory and
     # referenced from markdown via the URL prefix below.
     DOCS_ASSETS_SUBDIR: str = "assets"
+<<<<<<< Updated upstream
     DOCS_ASSETS_URL_PREFIX: str = "/static/docs-assets"
+=======
+    DOCS_ASSETS_URL_PREFIX: str = "/docs/assets"
+>>>>>>> Stashed changes
     DOCS_ASSET_MAX_BYTES: int = int(
         os.getenv("DOCS_ASSET_MAX_BYTES", str(10 * 1024 * 1024))  # 10 MB
     )

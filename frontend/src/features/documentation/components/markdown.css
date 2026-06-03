@@ -4,7 +4,11 @@
   color: #1f2937;
   font-size: 14.5px;
   text-align: left;
+<<<<<<< Updated upstream
   max-width: 880px; /* comfortable measure, similar to a Word page */
+=======
+  /* max-width: 1000px; comfortable measure, similar to a Word page */
+>>>>>>> Stashed changes
 }
 
 /* Clear floats so a long-floated image doesn't bleed past the next heading. */

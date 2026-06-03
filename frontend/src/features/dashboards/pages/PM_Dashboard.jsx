@@ -31,6 +31,19 @@ export default function PMDashboard() {
   const [loading, setLoading] = useState(true);
   const [familyOptions, setFamilyOptions] = useState([]);
   const [selectedFamilies, setSelectedFamilies] = useState([]);
+  // Tab switching logic based on hash
+  const tabKeys = ["mine", "business"];
+  const getTabFromHash = () => {
+    const hash = window.location.hash.replace(/^#/, "");
+    return tabKeys.includes(hash) ? hash : "mine";
+  };
+  const [activeTab, setActiveTab] = useState(getTabFromHash());
+  // Listen for hash changes
+  useEffect(() => {
+    const onHashChange = () => setActiveTab(getTabFromHash());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   // Load the families the current PM is handling (pm_families assignments).
   useEffect(() => {
@@ -271,13 +284,17 @@ export default function PMDashboard() {
     <Space orientation="vertical" size="large" style={{ width: "100%" }}>
       <Title level={3} style={{ margin: 0 }}>Program Manager Dashboard</Title>
       <Tabs
-        defaultActiveKey="mine"
+        activeKey={activeTab}
+        onChange={key => {
+          setActiveTab(key);
+          window.location.hash = `#${key}`;
+        }}
         items={[
           { key: "mine", label: "My Build Plans", children: myPlansContent },
           {
             key: "business",
             label: "Overview",
-            children: <BusinessOverview />,
+            children: <BusinessOverview />, 
           },
         ]}
       />

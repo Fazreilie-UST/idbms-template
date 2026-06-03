@@ -1,3 +1,7 @@
+const AuditLogsPage = lazy(() => import("@/features/auditLogs"));
+const LogReportsPage = lazy(() => import("@/features/logReports"));
+const DevLogReportsPage = lazy(() => import("@/features/logReports/DevLogReportsPage"));
+const BugReportView = lazy(() => import("@/features/logReports/BugReportView"));
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Spin } from "antd";
@@ -109,10 +113,12 @@ function App() {
               </Route>
             </Route>
 
-            {/* Shared tracker pages - both roles can access */}
+
+
+            {/* Shared tracker pages and logs/reports - all roles can access */}
             <Route
               element={
-                <ProtectedRoute allowedRoles={["Program Manager", "Requestor"]} />
+                <ProtectedRoute allowedRoles={["Program Manager", "Requestor", "Admin", "Developer"]} />
               }
             >
               <Route element={<MainLayout />}>
@@ -126,10 +132,31 @@ function App() {
                 <Route path="/shipment-tracker" element={<ShippingTracker />} />
                 <Route path="/account" element={<AccountSettings />} />
                 <Route path="/documentation" element={<DocumentationPage />} />
+<<<<<<< Updated upstream
+=======
+                {/* Audit & Logs: Admin only */}
+                <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
+                  <Route path="/logs/audit" element={<AuditLogsPage />} />
+                  <Route path="/logs/bug-reports" element={<DevLogReportsPage />} />
+                  <Route path="/logs/bug-reports/:reportId" element={<BugReportView />} />
+                </Route>
+                {/* All roles: Report an Issue */}
+                <Route path="/logs/reports" element={<LogReportsPage />} />
+>>>>>>> Stashed changes
               </Route>
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Logs & Reports Section */}
+            {/* Admin/Dev: Audit Logs and All Reports */}
+            <Route element={<ProtectedRoute allowedRoles={["Admin", "Developer"]} />}>
+              <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
+              <Route path="/admin/log-reports" element={<DevLogReportsPage />} />
+            </Route>
+            {/* All users: Submit Report */}
+            <Route element={<ProtectedRoute allowedRoles={["Requestor", "Program Manager", "Admin", "Developer"]} />}>
+              <Route path="/reports/submit" element={<LogReportsPage />} />
+            </Route>
           </Routes>
         </Suspense>
       </BrowserRouter>

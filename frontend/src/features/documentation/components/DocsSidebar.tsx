@@ -118,8 +118,13 @@ export default function DocsSidebar({
 }: DocsSidebarProps) {
   // Start with every group open so the user can see the full structure on
   // first render; subsequent toggling is remembered in component state.
+<<<<<<< Updated upstream
   const initiallyOpen = useMemo(() => new Set(collectGroupKeys(tree)), [tree]);
   const [expanded, setExpanded] = useState<Set<string>>(initiallyOpen);
+=======
+  // By default, no nodes are expanded
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+>>>>>>> Stashed changes
 
   // Whenever the selection changes, make sure its parent groups stay open
   // (e.g. after a deep link / restored session).

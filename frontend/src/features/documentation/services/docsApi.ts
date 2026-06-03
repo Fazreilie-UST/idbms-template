@@ -22,6 +22,10 @@ export interface DocPageContent {
   updated_at: string | null;
   embed: string | null;
   can_edit: boolean;
+<<<<<<< Updated upstream
+=======
+  format?: "markdown" | "html";
+>>>>>>> Stashed changes
 }
 
 export interface DocAsset {

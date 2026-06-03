@@ -26,6 +26,4 @@ class User(Base):
     department = relationship("Department", back_populates="users")
     roles = relationship("Role", secondary="user_roles", back_populates="users")
 
-
-    import_jobs = relationship("ImportJob", back_populates="imported_by")
     stored_files = relationship("StoredFile", back_populates="uploaded_by")

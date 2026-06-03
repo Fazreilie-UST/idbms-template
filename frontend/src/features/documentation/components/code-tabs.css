@@ -1,0 +1,50 @@
+.code-tabs-wrapper {
+  margin: 1.5rem 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+.code-tab-bar {
+  display: flex;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e5e7eb;
+  gap: 0;
+}
+.code-tab {
+  padding: 0.65rem 1.1rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  color: #64748b;
+  cursor: pointer;
+  white-space: nowrap;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.code-tab:hover {
+  color: #0f172a;
+  background: #e2e8f0;
+}
+.code-tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  background: #fff;
+  font-weight: 600;
+}
+.code-tab-panel {
+  background: #fff;
+}
+.code-tab-panel pre {
+  padding: 1.25rem 1.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: #0f172a;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre;
+  background: #fff;
+}

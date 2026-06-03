@@ -16,4 +16,3 @@ class StoredFile(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     uploaded_by = relationship("User")
-    import_jobs = relationship("ImportJob", back_populates="stored_file")

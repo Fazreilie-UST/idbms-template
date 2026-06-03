@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { useRef, useState } from "react";
 import {
   Button,
@@ -286,3 +287,7 @@ export default function MarkdownEditor({
     </div>
   );
 }
+=======
+
+// MarkdownEditor is now deprecated. All docs use the HTML code editor.
+>>>>>>> Stashed changes

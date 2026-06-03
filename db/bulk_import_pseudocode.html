@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Build Plan Bulk Import — Revision-Aware Design</title>
+</head>
+<body>
+  <h1>Build Plan Bulk Import — Revision-Aware Design</h1>
+  <h2>Goals</h2>
+  <ul>
+    <li>One row per <code>(family_sku, config_number)</code> in <code>build_plans</code> (the "canonical" / "latest state" row). The Build Plan Tracker page reads this directly.</li>
+    <li>Every imported file that introduces a real change produces one <code>BuildPlanRevision</code> row → append-only history per config number.</li>
+    <li>Files that contain the config but introduce no changes do NOT create a revision and do NOT pollute <code>audit_logs</code>. They are recorded in <code>BuildPlanImportFileTouch</code> so we can answer <em>"was this file processed against this config?"</em> without inflating history.</li>
+    <li>The canonical row always reflects the latest revision's status + data. Children (components, tests, build requests, warehouse quantities) mirror the latest revision too.</li>
+    <li>A file is considered "later" than an existing revision by chronological key <code>(work_year, work_week, file_revision)</code>. Files may arrive out of order, so we may need to insert revisions mid-history.</li>
+  </ul>
+  <hr>
+  <h2>Data model changes</h2>
+  <h3>BuildPlan (modified)</h3>
+  <ul>
+    <li><strong>Drop</strong> the unique constraint <code>(family_sku_id, config_number_id, work_year, work_week, file_revision)</code>.</li>
+    <li><strong>Add</strong> unique constraint <code>(family_sku_id, config_number_id)</code>.</li>
+    <li><strong>Add</strong> columns:
+      <ul>
+        <li><code>latest_revision_id</code> → FK to <code>build_plan_revisions(id)</code> (nullable until first revision exists; in practice always set after import).</li>
+        <li><code>first_seen_file_id</code>, <code>last_seen_file_id</code> → FK to <code>build_plan_import_files(id)</code>, both ON DELETE SET NULL.</li>
+      </ul>
+    </li>
+    <li><strong>Keep</strong> scalar columns (status, dates, quantities, special_instruction, build_description_id, support_activity_id, mm/ta/pba/as numbers, …). They always hold the <em>latest</em> value.</li>
+    <li><strong>Remove</strong> <code>work_week</code>, <code>work_year</code>, <code>file_revision</code>, <code>revision</code>, <code>import_file_id</code> from <code>BuildPlan</code> — that data now lives on <code>BuildPlanRevision</code>.</li>
+  </ul>
+  <h3>BuildPlanRevision (new, append-only)</h3>
+  <pre>
+id                   PK
+build_plan_id        FK -> build_plans (ON DELETE CASCADE)
+revision_number      int     -- 1,2,3 …  in chronological order
+import_file_id       FK -> build_plan_import_files (ON DELETE SET NULL)
+work_year            int
+work_week            int
+file_revision        int
+snapshot             JSON    -- full snapshot of plan + children at this revision
+changed_fields       JSON    -- row-level diff vs previous revision (see below)
+status_at_revision   Enum(BuildPlanStatus)   -- denormalised for fast tracker queries
+created_at           datetime
+
+UNIQUE (build_plan_id, revision_number)
+INDEX  (build_plan_id, work_year, work_week, file_revision)
+  </pre>
+  <h3>BuildPlanImportFileTouch (new)</h3>
+  <p>... (continue as needed) ...</p>
+</body>
+</html>

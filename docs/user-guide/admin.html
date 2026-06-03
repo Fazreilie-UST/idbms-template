@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Guide</title>
+</head>
+<body>
+  <p>Administrators have full access to every screen in the application plus the following responsibilities:</p>
+  <h2 style="color: black;">User &amp; role management</h2>
+  <ul>
+    <li><strong>User Management</strong> (<code>/pm/admin/users</code>) – create users, deactivate users, reset passwords, and assign roles.</li>
+    <li><strong>Role Management</strong> (<code>/pm/admin/roles</code>) – review the available roles and the permissions they grant. Permissions are seeded from the backend and enforced via JWT claims.</li>
+  </ul>
+  <h2 style="color: black;">Reference data</h2>
+  <ul>
+    <li><strong>DB Tables</strong> (<code>/pm/admin/db-tables</code>) – maintain lookup tables (forwarders, warehouses, addresses, components, suppliers, etc.).</li>
+  </ul>
+  <h2 style="color: black;">Documentation</h2>
+  <ul>
+    <li>Only users with the <strong>Admin</strong> role see the <strong>Edit</strong> button on documentation pages. Use it to update the page contents and upload screenshots.</li>
+    <li>Updates are written back to HTML files in the project repository so every change is captured in version control.</li>
+  </ul>
+</body>
+</html>

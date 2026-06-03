@@ -54,15 +54,6 @@ const reportIssueItem = {
     const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(false);
 
-<<<<<<< Updated upstream
-    const documentationItem = {
-      key: "/documentation",
-      icon: <ReadOutlined />,
-      label: "Documentation",
-    };
-
-    const pmItems: MenuItems = [
-=======
 
 
     const auditLogsGroup = isAdmin
@@ -78,7 +69,6 @@ const reportIssueItem = {
       : null;
 
     const pmItems = [
->>>>>>> Stashed changes
       { key: "/pm/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
       { key: "/pm/build-plans", icon: <BookOutlined />, label: "My Build Plans" },
       { key: "/pm/build-requests", icon: <SolutionOutlined />, label: "Manage Build Requests" },
@@ -104,20 +94,6 @@ const reportIssueItem = {
       { key: "/requestor/dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
       { key: "/requestor/build-requests", icon: <SolutionOutlined />, label: "My Build Requests" },
       sharedTrackerGroup,
-<<<<<<< Updated upstream
-      documentationItem,
-    ];
-
-    if (isProgramManager) {
-      pmItems.push(documentationItem);
-    }
-
-    return [
-      ...(isProgramManager ? pmItems : []),
-      ...(isRequestor && !isProgramManager ? requestorItems : []),
-    ];
-  }, [isProgramManager, isRequestor]);
-=======
       ...(auditLogsGroup ? [auditLogsGroup] : []),
       documentationItem,
       reportIssueItem,
@@ -129,7 +105,6 @@ const reportIssueItem = {
         ...(isRequestor && !isProgramManager ? requestorItems : []),
       ];
     }, [isProgramManager, isRequestor, role]);
->>>>>>> Stashed changes
 
     const selectedKey = useMemo(() => {
       if (location.pathname.startsWith("/pm/build-plans/")) return "/pm/build-plans";

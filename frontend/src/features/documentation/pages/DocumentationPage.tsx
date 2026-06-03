@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-<<<<<<< Updated upstream
-=======
 // Utility: Extract only the content inside <body>...</body> from a full HTML string
 function extractBodyContent(html: string): string {
   // Try to extract <body>...</body> content
@@ -16,7 +14,6 @@ function extractBodyContent(html: string): string {
     .replace(/<\/html>/gi, "")
     .trim();
 }
->>>>>>> Stashed changes
 import {
   Alert,
   Button,
@@ -34,10 +31,7 @@ import { EditOutlined } from "@ant-design/icons";
 import DocsSidebar from "../components/DocsSidebar";
 import MarkdownView from "../components/MarkdownView";
 import MarkdownEditor from "../components/MarkdownEditor";
-<<<<<<< Updated upstream
-=======
 import HtmlCodeEditor from "../components/HtmlCodeEditor";
->>>>>>> Stashed changes
 import SwaggerEmbed from "../components/SwaggerEmbed";
 import {
   fetchDocPage,
@@ -48,10 +42,6 @@ import {
   type DocTreeResponse,
 } from "../services/docsApi";
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 const { Sider, Content } = Layout;
 const { Title, Text } = Typography;
 
@@ -157,12 +147,6 @@ export default function DocumentationPage() {
       if (!selectedPath) return;
       setSaving(true);
       try {
-<<<<<<< Updated upstream
-        const updated = await updateDocPage(selectedPath, content);
-        setPage(updated);
-        setEditing(false);
-        messageApi.success("Documentation saved");
-=======
         await updateDocPage(selectedPath, content);
         setEditing(false);
         messageApi.success("Documentation saved");
@@ -173,7 +157,6 @@ export default function DocumentationPage() {
           .then((res) => setPage(res))
           .catch((err) => setPageError(err instanceof Error ? err.message : "Failed to load page"))
           .finally(() => setPageLoading(false));
->>>>>>> Stashed changes
       } catch (err) {
         messageApi.error(
           err instanceof Error ? err.message : "Failed to save documentation",
@@ -249,11 +232,7 @@ export default function DocumentationPage() {
         )}
       </Sider>
       <Content style={{ padding: "28px 36px 48px", overflow: "auto" }}>
-<<<<<<< Updated upstream
-        <div style={{ maxWidth: 880, textAlign: "left" }}>
-=======
         <div style={{ textAlign: "left" }}>
->>>>>>> Stashed changes
           {!selectedPath && !treeError && (
             <Empty description="Select a documentation page from the sidebar" />
           )}
@@ -320,11 +299,6 @@ export default function DocumentationPage() {
                 <Skeleton active paragraph={{ rows: 10 }} />
               )}
 
-<<<<<<< Updated upstream
-              {!pageLoading && !pageError && page && !editing && (
-                <>
-                  <MarkdownView source={page.content} />
-=======
 
               {!pageLoading && !pageError && page && !editing && (
                 <>
@@ -339,17 +313,12 @@ export default function DocumentationPage() {
                   ) : (
                     <MarkdownView source={page.content} />
                   )}
->>>>>>> Stashed changes
                   {page.embed === "swagger" && <SwaggerEmbed />}
                 </>
               )}
 
               {!pageLoading && !pageError && page && editing && (
-<<<<<<< Updated upstream
-                <MarkdownEditor
-=======
                 <HtmlCodeEditor
->>>>>>> Stashed changes
                   initialContent={page.content}
                   saving={saving}
                   onSave={handleSave}

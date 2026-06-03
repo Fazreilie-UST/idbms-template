@@ -17,11 +17,8 @@ from app.api.v1.endpoints import (
     component_suppliers,
     dashboard,
     documentation,
-<<<<<<< Updated upstream
-=======
     log_reports,
     audit_logs,
->>>>>>> Stashed changes
 )
 
 api_router = APIRouter()

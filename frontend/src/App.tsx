@@ -132,8 +132,6 @@ function App() {
                 <Route path="/shipment-tracker" element={<ShippingTracker />} />
                 <Route path="/account" element={<AccountSettings />} />
                 <Route path="/documentation" element={<DocumentationPage />} />
-<<<<<<< Updated upstream
-=======
                 {/* Audit & Logs: Admin only */}
                 <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
                   <Route path="/logs/audit" element={<AuditLogsPage />} />
@@ -142,7 +140,6 @@ function App() {
                 </Route>
                 {/* All roles: Report an Issue */}
                 <Route path="/logs/reports" element={<LogReportsPage />} />
->>>>>>> Stashed changes
               </Route>
             </Route>
 

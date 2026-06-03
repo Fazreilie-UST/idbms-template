@@ -39,7 +39,7 @@ export default function HtmlCodeEditor({ initialContent, saving, onSave, onCance
   // Asset modal state
   const [assetModalOpen, setAssetModalOpen] = useState(false);
   const handleInsertAsset = (asset: { url: string; filename: string }) => {
-    insertAtCursor(`<img src=\"${asset.url}\" alt=\"\" style=\"max-width:100%;\" />`);
+    insertAtCursor(`<img src="http://localhost:8000${asset.url}" alt="" style="max-width:100%;" />`);
     setAssetModalOpen(false);
   };
 

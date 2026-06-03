@@ -29,79 +29,6 @@ from app.models.auth.user import User
 router = APIRouter(prefix="/docs", tags=["Documentation"])
 
 
-<<<<<<< Updated upstream
-# ---------------------------------------------------------------------------
-# Documentation tree (default structure required by the product spec).
-# Each leaf has a ``path`` relative to ``settings.DOCS_DIR`` and a stable
-# ``key`` the frontend uses for routing. The tree is the single source of
-# truth: only files referenced here can be read or written via this API.
-# ---------------------------------------------------------------------------
-
-DOC_TREE: list[dict[str, Any]] = [
-    {
-        "key": "user-guide",
-        "label": "User Guide",
-        "children": [
-            {
-                "key": "screen-guide",
-                "label": "Screen Guide",
-                "path": "user-guide/screen-guide.md",
-            },
-            {
-                "key": "admin",
-                "label": "Admin",
-                "path": "user-guide/admin.md",
-            },
-            {
-                "key": "program-manager",
-                "label": "Program Manager",
-                "path": "user-guide/program-manager.md",
-            },
-            {
-                "key": "requestor",
-                "label": "Requestor",
-                "path": "user-guide/requestor.md",
-            },
-        ],
-    },
-    {
-        "key": "developer",
-        "label": "Developer",
-        "children": [
-            {
-                "key": "api-documentation",
-                "label": "API Documentation",
-                "path": "developer/api-documentation.md",
-                # The frontend renders an embedded Swagger UI alongside the
-                # markdown body for this page.
-                "embed": "swagger",
-            },
-            {
-                "key": "db-erd",
-                "label": "DB ERD",
-                "children": [
-                    {
-                        "key": "current-db",
-                        "label": "Current Database",
-                        "path": "developer/db-erd/current-db.md",
-                    },
-                    {
-                        "key": "external-db",
-                        "label": "External Database",
-                        "path": "developer/db-erd/external-db.md",
-                    },
-                ],
-            },
-            {
-                "key": "architecture-summary",
-                "label": "System Structure & Architecture Summary",
-                "path": "developer/architecture-summary.md",
-            },
-        ],
-    },
-]
-=======
-
 # ---------------------------------------------------------------------------
 # Role-based Documentation Tree Generation
 # ---------------------------------------------------------------------------
@@ -234,7 +161,6 @@ def get_allowed_pages_for_roles(roles: set[str]) -> dict[str, dict[str, Any]]:
     return _collect_allowed_paths(get_doc_tree_for_roles(roles))
 
 
->>>>>>> Stashed changes
 
 
 def _collect_allowed_paths(tree: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -247,11 +173,6 @@ def _collect_allowed_paths(tree: list[dict[str, Any]]) -> dict[str, dict[str, An
     return out
 
 
-<<<<<<< Updated upstream
-_ALLOWED_PAGES: dict[str, dict[str, Any]] = _collect_allowed_paths(DOC_TREE)
-=======
-
->>>>>>> Stashed changes
 
 
 # ---------------------------------------------------------------------------
@@ -273,41 +194,21 @@ def _assets_root() -> Path:
     return root
 
 
-<<<<<<< Updated upstream
-def _resolve_page_path(rel_path: str) -> Path:
-    """Resolve and validate ``rel_path`` against the whitelist.
-
-    Returns the absolute on-disk path. Raises 404 if the path is not in the
-    allowed page set, 400 for malformed paths. We re-resolve and re-check the
-    parent prefix as a defense in depth against symlink shenanigans.
-    """
-    if rel_path not in _ALLOWED_PAGES:
-        raise HTTPException(status_code=404, detail="Unknown documentation page")
-
-    # Extra belt-and-suspenders: every segment must look like a slug. The
-    # whitelist already guarantees this, but a future edit to ``DOC_TREE``
-    # shouldn't be able to silently introduce ``..`` or absolute paths.
-=======
 def _resolve_page_path(rel_path: str, allowed_pages: dict[str, dict[str, Any]]) -> Path:
     """Resolve and validate ``rel_path`` against the whitelist for the current role."""
     if rel_path not in allowed_pages:
         raise HTTPException(status_code=404, detail="Unknown documentation page")
 
->>>>>>> Stashed changes
     parts = rel_path.split("/")
     for segment in parts[:-1]:
         if not _SAFE_SEGMENT_RE.match(segment):
             raise HTTPException(status_code=400, detail="Invalid path segment")
-<<<<<<< Updated upstream
-    if not parts[-1].endswith(".md") or not _SAFE_SEGMENT_RE.match(parts[-1][:-3]):
-=======
     # Accept .md or .html files
     if not (parts[-1].endswith(".md") or parts[-1].endswith(".html")):
         raise HTTPException(status_code=400, detail="Invalid page filename")
     # Validate filename slug (strip .md or .html)
     base = parts[-1][:-3] if parts[-1].endswith(".md") else parts[-1][:-5]
     if not _SAFE_SEGMENT_RE.match(base):
->>>>>>> Stashed changes
         raise HTTPException(status_code=400, detail="Invalid page filename")
 
     root = _docs_root()
@@ -343,10 +244,7 @@ class DocPageContent(BaseModel):
     updated_at: datetime | None = None
     embed: str | None = None
     can_edit: bool = False
-<<<<<<< Updated upstream
-=======
     format: str = "markdown"  # "markdown" or "html"
->>>>>>> Stashed changes
 
 
 class DocPageUpdate(BaseModel):
@@ -379,11 +277,7 @@ class DocTreeResponse(BaseModel):
 def get_doc_tree(current_user: User = Depends(get_current_user)) -> DocTreeResponse:
     roles = getattr(current_user, "token_roles", set()) or set()
     return DocTreeResponse(
-<<<<<<< Updated upstream
-        tree=DOC_TREE,
-=======
         tree=get_doc_tree_for_roles(roles),
->>>>>>> Stashed changes
         can_edit=settings.DOCS_EDIT_ROLE in roles,
         assets_url_prefix=settings.DOCS_ASSETS_URL_PREFIX,
     )
@@ -395,13 +289,6 @@ def get_doc_page(
     current_user: User = Depends(get_current_user),
 ) -> DocPageContent:
     """Return the markdown content for ``path`` (relative to docs root)."""
-<<<<<<< Updated upstream
-    node = _ALLOWED_PAGES.get(path)
-    if node is None:
-        raise HTTPException(status_code=404, detail="Unknown documentation page")
-
-    target = _resolve_page_path(path)
-=======
     roles = getattr(current_user, "token_roles", set()) or set()
     allowed_pages = get_allowed_pages_for_roles(roles)
     node = allowed_pages.get(path)
@@ -409,7 +296,6 @@ def get_doc_page(
         raise HTTPException(status_code=404, detail="Unknown documentation page")
 
     target = _resolve_page_path(path, allowed_pages=allowed_pages)
->>>>>>> Stashed changes
     content = ""
     updated_at: datetime | None = None
     if target.exists():
@@ -419,11 +305,7 @@ def get_doc_page(
         except OSError as exc:
             raise HTTPException(status_code=500, detail=f"Could not read page: {exc}")
 
-<<<<<<< Updated upstream
-    roles = getattr(current_user, "token_roles", set()) or set()
-=======
     fmt = "html" if path.endswith(".html") else "markdown"
->>>>>>> Stashed changes
     return DocPageContent(
         path=path,
         label=node.get("label", path),
@@ -431,10 +313,7 @@ def get_doc_page(
         updated_at=updated_at,
         embed=node.get("embed"),
         can_edit=settings.DOCS_EDIT_ROLE in roles,
-<<<<<<< Updated upstream
-=======
         format=fmt,
->>>>>>> Stashed changes
     )
 
 
@@ -445,13 +324,6 @@ def update_doc_page(
     current_user: User = Depends(_require_docs_editor),
 ) -> DocPageContent:
     """Replace the markdown content for ``path``. Admin-only."""
-<<<<<<< Updated upstream
-    node = _ALLOWED_PAGES.get(path)
-    if node is None:
-        raise HTTPException(status_code=404, detail="Unknown documentation page")
-
-    target = _resolve_page_path(path)
-=======
     roles = getattr(current_user, "token_roles", set()) or set()
     allowed_pages = get_allowed_pages_for_roles(roles)
     node = allowed_pages.get(path)
@@ -459,7 +331,6 @@ def update_doc_page(
         raise HTTPException(status_code=404, detail="Unknown documentation page")
 
     target = _resolve_page_path(path, allowed_pages=allowed_pages)
->>>>>>> Stashed changes
     target.parent.mkdir(parents=True, exist_ok=True)
     try:
         # Atomic-ish write: write to a temp file then rename so a crash mid-
